@@ -1,0 +1,8 @@
+*~
+*.o
+*.a
+/doc/libscheme.aux
+/doc/libscheme.fdb_latexmk
+/doc/libscheme.fls
+/doc/libscheme.log
+/test
