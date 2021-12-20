@@ -29,6 +29,7 @@
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" 
@@ -60,6 +61,14 @@ struct Scheme_Env
 };
 typedef struct Scheme_Env Scheme_Env;
 
+struct Scheme_Cont
+{
+  int escaped;
+  jmp_buf buffer;
+  struct Scheme_Object *retval;
+};
+typedef struct Scheme_Cont Scheme_Cont;
+
 struct Scheme_Object
 {
   union
@@ -69,6 +78,7 @@ struct Scheme_Object
       double double_val;
       char *string_val;
       void *ptr_val;
+      struct Scheme_Cont *cont_val;
       struct { void *ptr1, *ptr2; } two_ptr_val;
       struct Scheme_Object *(*prim_val)
 	(int argc, struct Scheme_Object *argv[]);
@@ -90,6 +100,7 @@ typedef struct Scheme_Object Scheme_Object;
 #define SCHEME_DBL_VAL(obj)  ((obj)->u.double_val)
 #define SCHEME_STR_VAL(obj)  ((obj)->u.string_val)
 #define SCHEME_PTR_VAL(obj)  ((obj)->u.ptr_val)
+#define SCHEME_CONT_VAL(obj) ((obj)->u.cont_val)
 #define SCHEME_PTR1_VAL(obj) ((obj)->u.two_ptr_val.ptr1)
 #define SCHEME_PTR2_VAL(obj) ((obj)->u.two_ptr_val.ptr2)
 #define SCHEME_SYNTAX(obj)   ((obj)->u.syntax_val)
@@ -171,10 +182,6 @@ void *scheme_malloc (size_t size);
 void *scheme_calloc (size_t num, size_t size);
 char *scheme_strdup (char *str);
 
-/* garbage collected heap interface */
-extern void *GC_malloc (size_t size_in_bytes);
-extern int GC_expand_hp (int num_4k_blocks);
-
 /* hash table interface */
 Scheme_Hash_Table *scheme_hash_table (int size);
 void scheme_add_to_table (Scheme_Hash_Table *table, char *key, void *val);
@@ -184,7 +191,7 @@ void *scheme_lookup_in_table (Scheme_Hash_Table *table, char *key);
 /* constructors */
 Scheme_Object *scheme_make_prim (Scheme_Prim *prim);
 Scheme_Object *scheme_make_closure (Scheme_Env *env, Scheme_Object *code);
-Scheme_Object *scheme_make_cont (jmp_buf buf);
+Scheme_Object *scheme_make_cont (void);
 Scheme_Object *scheme_make_type (char *name);
 Scheme_Object *scheme_make_pair (Scheme_Object *car, Scheme_Object *cdr);
 Scheme_Object *scheme_make_string (char *chars);

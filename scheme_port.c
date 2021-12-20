@@ -231,17 +231,34 @@ file_ungetc (int ch, Scheme_Input_Port *port)
   ungetc (ch, (FILE *)port->port_data);
 }
 
+#if !defined(HAS_STANDARD_IOB) && !defined(HAS_GNU_IOB)
+/* https://stackoverflow.com/questions/1594251/how-to-check-if-stdin-is-still-opened-without-blocking
+ */
+static int is_ready(int fd)
+{
+  fd_set fdset;
+  struct timeval timeout;
+  int ret;
+  FD_ZERO(&fdset);
+  FD_SET(fd, &fdset);
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 1;
+  return select(fd+1, &fdset, NULL, NULL, &timeout) == 1 ? 1 : 0;
+}
+#endif
+
 static int
 file_char_ready (Scheme_Input_Port *port)
 {
   FILE *fp = (FILE *) port->port_data;
-#ifdef HAS_STANDARD_IOB  
+#ifdef HAS_STANDARD_IOB
   return (fp->_cnt);
 #elif HAS_GNU_IOB
   return (fp->_egptr - fp->_gptr);
 #else
-  scheme_warning ("char-ready? always returns #f on this platform");
-  return (scheme_false);
+  /* scheme_warning ("char-ready? always returns #f on this platform"); */
+  /* return (scheme_false); */
+  return is_ready(fileno(fp));
 #endif
 }
 
@@ -249,7 +266,10 @@ static void
 file_close_input (Scheme_Input_Port *port)
 {
   FILE *fp = (FILE *) port->port_data;
-  fclose (fp);
+  if (fp) {
+    fclose (fp);
+    port->port_data = NULL;
+  }
 }
 
 Scheme_Object *

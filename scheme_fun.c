@@ -81,14 +81,18 @@ scheme_make_closure (Scheme_Env *env, Scheme_Object *code)
 }
 
 Scheme_Object *
-scheme_make_cont (jmp_buf buf)
+scheme_make_cont (void)
 {
-  Scheme_Object *cont;
+  Scheme_Object *obj;
+  Scheme_Cont *cont;
 
-  cont = scheme_alloc_object ();
-  SCHEME_TYPE (cont) = scheme_cont_type;
-  SCHEME_PTR_VAL (cont) = buf;
-  return (cont);
+  obj = scheme_alloc_object ();
+  SCHEME_TYPE (obj) = scheme_cont_type;
+  cont = scheme_calloc(1, sizeof(Scheme_Cont));
+  cont->escaped = 0;
+  cont->retval = scheme_null;
+  SCHEME_CONT_VAL (obj) = cont;
+  return (obj);
 }
 
 Scheme_Object *
@@ -220,9 +224,15 @@ scheme_apply (Scheme_Object *rator, int num_rands, Scheme_Object **rands)
     }
   else if (fun_type == scheme_cont_type)
     {
+      Scheme_Cont *cont = SCHEME_CONT_VAL(rator);
       SCHEME_ASSERT ((num_rands == 1),
-		     "apply: wrong number of args to continuation procedure");
-      longjmp ((int *)SCHEME_PTR_VAL(rator), (int)rands[0]);
+                     "apply: wrong number of args to continuation procedure");
+      if (cont->escaped)
+        {
+          scheme_signal_error("apply: continuation has been escaped");
+        }
+      cont->retval = rands[0];
+      longjmp (cont->buffer, 0);
     }
   else if (fun_type == scheme_struct_proc_type)
     {
@@ -419,19 +429,27 @@ for_each (int argc, Scheme_Object *argv[])
 static Scheme_Object *
 call_cc (int argc, Scheme_Object *argv[])
 {
-  jmp_buf buf;
-  Scheme_Object *ret, *cont;
+  Scheme_Cont *cont;
+  Scheme_Object *ret = scheme_null, *obj;
 
   SCHEME_ASSERT ((argc == 1), "call-with-current-continuation: wrong number of args");
-  SCHEME_ASSERT (SCHEME_PROCP (argv[0]), 
-		 "call-with-current-continuation: arg must be a procedure");
-  if (ret = (Scheme_Object *)setjmp (buf))
+  SCHEME_ASSERT (SCHEME_PROCP (argv[0]),
+                 "call-with-current-continuation: arg must be a procedure");
+
+  obj = scheme_make_cont();
+  cont = SCHEME_CONT_VAL(obj);
+
+  if (setjmp (cont->buffer))
     {
-      return (ret);
+      ret = cont->retval;
+      cont->retval = scheme_null;
     }
   else
     {
-      cont = scheme_make_cont (buf);
-      return (scheme_apply_to_list (argv[0], scheme_make_pair (cont, scheme_null)));
+      return (scheme_apply_to_list (argv[0], scheme_make_pair (obj, scheme_null)));
     }
+
+  cont->escaped = 1;
+
+  return (ret);
 }

@@ -5,19 +5,21 @@
 #
 # This must be an ANSI C compiler.
 #
-CC = cc
+CC = gcc
 
 #
 # Optimization and debugging flags go here.
 #
 #CFLAGS = -O
-CFLAGS = -ggdb3 -O0
+#CFLAGS = -ggdb3 -O0 -I${HOME}/local/include
+CFLAGS = -ggdb3 -O0 -DNO_GC
+#CFLAGS = -ggdb3 -O0 -DNO_GC -m32
 
 #
 # The math library is needed for the numeric functions
 # in scheme_number.c.
-#
-LIBS = -L.. -L${HOME}/local/lib64 -L${HOME}/local/lib -lm -lgc
+#LIBS = -L.. -L${HOME}/local/lib64 -L${HOME}/local/lib -lm -lgc
+LIBS = -lm
 
 #
 # If your system needs ranlib, put it here.  Otherwise,
