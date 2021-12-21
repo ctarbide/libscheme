@@ -25,28 +25,25 @@
 #include "scheme.h"
 #include <string.h>
 
-extern char *scheme_strdup(char *);
-static unsigned int scheme_hash(char *key);
-
 Scheme_Hash_Table *
-scheme_hash_table(int size)
+scheme_hash_table(size_t size)
 {
 	Scheme_Hash_Table *table;
-	table = (Scheme_Hash_Table*) scheme_malloc(sizeof(Scheme_Hash_Table));
+	table = (Scheme_Hash_Table *) scheme_malloc(sizeof(Scheme_Hash_Table));
 	table->size = size;
-	table->buckets = (Scheme_Bucket **) scheme_calloc(size, sizeof(Scheme_Bucket *));
+	table->buckets = (Scheme_Bucket **) scheme_calloc((size_t)size, sizeof(Scheme_Bucket *));
 	return (table);
 }
 
 void
 scheme_add_to_table(Scheme_Hash_Table *table, char *key, void *val)
 {
-	unsigned int h, i;
+	size_t h, i;
 	Scheme_Bucket *bucket;
 	h = i = 0;
 
 	while (key[i]) {
-		h += (h << 5) + h + key[i++];
+		h += (h << 5) + h + (size_t)key[i++];
 	}
 
 	h = h % table->size;
@@ -60,14 +57,14 @@ scheme_add_to_table(Scheme_Hash_Table *table, char *key, void *val)
 void *
 scheme_lookup_in_table(Scheme_Hash_Table *table, char *key)
 {
-	unsigned int h;
+	size_t h;
 	char *str;
 	Scheme_Bucket *bucket;
 	h = 0;
 	str = key;
 
 	while (*str) {
-		h += (h << 5) + h + *str++;
+		h += (h << 5) + h + (size_t) * str++;
 	}
 
 	h = h % table->size;
@@ -87,12 +84,12 @@ scheme_lookup_in_table(Scheme_Hash_Table *table, char *key)
 void
 scheme_change_in_table(Scheme_Hash_Table *table, char *key, void *new)
 {
-	unsigned int h, i;
+	size_t h, i;
 	Scheme_Bucket *bucket;
 	h = i = 0;
 
 	while (key[i]) {
-		h += (h << 5) + h + key[i++];
+		h += (h << 5) + h + (size_t)key[i++];
 	}
 
 	h = h % table->size;
@@ -108,15 +105,17 @@ scheme_change_in_table(Scheme_Hash_Table *table, char *key, void *new)
 	}
 }
 
+#if 0
 static unsigned int
 scheme_hash(char *key)
 {
-	unsigned int h;
+	size_t h;
 	h = 0;
 
 	while (*key) {
-		h += (h << 5) + h + *key++;
+		h += (h << 5) + h + (size_t) * key++;
 	}
 
-	return (h);
+	return (unsigned int)(h & UINT_MAX);
 }
+#endif

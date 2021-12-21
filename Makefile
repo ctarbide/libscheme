@@ -16,9 +16,12 @@ CPROTO = cproto
 #CFLAGS = -ggdb3 -O0 -DNO_GC
 #CFLAGS = -ggdb3 -O0 -DNO_GC -m32
 
+# -fmax-errors=N: GCC 4.6 and later
+
 CFLAGS = -ggdb3 -O0 -DNO_GC \
     -std=c99 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
-    -Wconversion -Wdeclaration-after-statement
+    -Wconversion -Wdeclaration-after-statement \
+    -Werror -fmax-errors=5
 
 #
 # The math library is needed for the numeric functions

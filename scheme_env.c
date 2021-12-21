@@ -77,7 +77,7 @@ scheme_add_global(char *name, Scheme_Object *obj, Scheme_Env *env)
 	i = 0;
 
 	while (name[i]) {
-		lower_name[i] = tolower(name[i]);
+		lower_name[i] = (char)tolower(name[i]);
 		i++;
 	}
 
@@ -91,8 +91,8 @@ scheme_new_frame(int num_bindings)
 	Scheme_Env *frame;
 	frame = (Scheme_Env *) scheme_malloc(sizeof(Scheme_Env));
 	frame->num_bindings = num_bindings;
-	frame->symbols = (Scheme_Object **) scheme_malloc(num_bindings * sizeof(Scheme_Object*));
-	frame->values = (Scheme_Object **) scheme_malloc(num_bindings * sizeof(Scheme_Object*));
+	frame->symbols = (Scheme_Object **) scheme_malloc((size_t)num_bindings * sizeof(Scheme_Object *));
+	frame->values = (Scheme_Object **) scheme_malloc((size_t)num_bindings * sizeof(Scheme_Object *));
 	return (frame);
 }
 
@@ -123,8 +123,8 @@ scheme_add_frame(Scheme_Object *syms, Scheme_Object *vals, Scheme_Env *env)
 	frame = (Scheme_Env *) scheme_malloc(sizeof(Scheme_Env));
 	len = scheme_list_length(syms);
 	frame->num_bindings = len;
-	frame->symbols = (Scheme_Object **) scheme_malloc(len * sizeof(Scheme_Object*));
-	frame->values = (Scheme_Object **) scheme_malloc(len * sizeof(Scheme_Object*));
+	frame->symbols = (Scheme_Object **) scheme_malloc((size_t)len * sizeof(Scheme_Object *));
+	frame->values = (Scheme_Object **) scheme_malloc((size_t)len * sizeof(Scheme_Object *));
 
 	for (i = 0 ; i < len ; ++i) {
 		if (SCHEME_SYMBOLP(syms)) {

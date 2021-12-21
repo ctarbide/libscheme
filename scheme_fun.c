@@ -100,7 +100,7 @@ scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands)
 
 	if (fun_type == scheme_closure_type) {
 		Scheme_Env *env, *frame;
-		Scheme_Object *params, *forms, *ret, *t1, *t2;
+		Scheme_Object *params, *forms, *ret;
 		Scheme_Object *vars, *vals, *vars_last, *vals_last, *pair, *aform;
 		int num_int_defs, num_params, i, has_rest;
 		env = SCHEME_CLOS_ENV(rator);
@@ -223,9 +223,10 @@ scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands)
 	} else if (fun_type == scheme_struct_proc_type) {
 		return (scheme_apply_struct_proc(rator,
 					scheme_collect_rest(num_rands, rands)));
-	} else {
-		scheme_signal_error("apply: bad procedure");
 	}
+
+	scheme_signal_error("apply: bad procedure");
+	return NULL; /* never happens, avoid warning */
 }
 
 Scheme_Object *
@@ -312,8 +313,6 @@ apply(int argc, Scheme_Object *argv[])
 	return (scheme_apply(argv[0], num_rands, rand_vec));
 }
 
-static Scheme_Object *map_help(Scheme_Object *fun, Scheme_Object *list);
-
 static Scheme_Object *
 map(int argc, Scheme_Object *argv[])
 {
@@ -367,6 +366,7 @@ map(int argc, Scheme_Object *argv[])
 	return (retfirst);
 }
 
+#if 0
 static Scheme_Object *
 map_help(Scheme_Object *fun, Scheme_Object *list)
 {
@@ -378,6 +378,7 @@ map_help(Scheme_Object *fun, Scheme_Object *list)
 					map_help(fun, SCHEME_CDR(list))));
 	}
 }
+#endif
 
 static Scheme_Object *
 for_each(int argc, Scheme_Object *argv[])

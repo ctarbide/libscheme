@@ -232,9 +232,10 @@ zero_p(int argc, Scheme_Object *argv[])
 		return (SCHEME_INT_VAL(argv[0]) == 0 ? scheme_true : scheme_false);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (SCHEME_DBL_VAL(argv[0]) == 0 ? scheme_true : scheme_false);
-	} else {
-		scheme_signal_error("zero?: arg must be a number");
 	}
+
+	scheme_signal_error("zero?: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -246,9 +247,10 @@ positive_p(int argc, Scheme_Object *argv[])
 		return (SCHEME_INT_VAL(argv[0]) > 0 ? scheme_true : scheme_false);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (SCHEME_DBL_VAL(argv[0]) > 0 ? scheme_true : scheme_false);
-	} else {
-		scheme_signal_error("positive?: arg must be a number");
 	}
+
+	scheme_signal_error("positive?: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -260,9 +262,10 @@ negative_p(int argc, Scheme_Object *argv[])
 		return (SCHEME_INT_VAL(argv[0]) < 0 ? scheme_true : scheme_false);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (SCHEME_DBL_VAL(argv[0]) < 0 ? scheme_true : scheme_false);
-	} else {
-		scheme_signal_error("negative?: arg must be a number");
 	}
+
+	scheme_signal_error("negative?: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -274,9 +277,10 @@ odd_p(int argc, Scheme_Object *argv[])
 		return (((SCHEME_INT_VAL(argv[0]) % 2) != 0) ? scheme_true : scheme_false);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (scheme_false);
-	} else {
-		scheme_signal_error("odd?: arg must be a number");
 	}
+
+	scheme_signal_error("odd?: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -288,9 +292,10 @@ even_p(int argc, Scheme_Object *argv[])
 		return ((SCHEME_INT_VAL(argv[0]) % 2) == 0 ? scheme_true : scheme_false);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (scheme_false);
-	} else {
-		scheme_signal_error("even?: arg must be a number");
 	}
+
+	scheme_signal_error("even?: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 GEN_BIN_PROT(bin_plus);
@@ -416,6 +421,9 @@ abs_prim(int argc, Scheme_Object *argv[])
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (scheme_make_double(fabs(SCHEME_DBL_VAL(argv[0]))));
 	}
+
+	scheme_signal_error("abs: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *bin_quotient(Scheme_Object *n1, Scheme_Object *n2);
@@ -527,8 +535,8 @@ bin_gcd(Scheme_Object *n1, Scheme_Object *n2)
 	int i1, i2, a, b, r;
 	SCHEME_ASSERT(SCHEME_NUMBERP(n1) && SCHEME_NUMBERP(n2),
 		"gcd: all arguments must be number");
-	i1 = (SCHEME_INTP(n1) ? SCHEME_INT_VAL(n1) : SCHEME_DBL_VAL(n1));
-	i2 = (SCHEME_INTP(n2) ? SCHEME_INT_VAL(n2) : SCHEME_DBL_VAL(n2));
+	i1 = SCHEME_INTP(n1) ? SCHEME_INT_VAL(n1) : (int)SCHEME_DBL_VAL(n1);
+	i2 = SCHEME_INTP(n2) ? SCHEME_INT_VAL(n2) : (int)SCHEME_DBL_VAL(n2);
 	i1 = ABS(i1);
 	i2 = ABS(i2);
 	a = MAX(i1, i2);
@@ -583,10 +591,11 @@ floor_prim(int argc, Scheme_Object *argv[])
 	if (SCHEME_INTP(argv[0])) {
 		return (argv[0]);
 	} else if (SCHEME_DBLP(argv[0])) {
-		return scheme_make_integer(floor(SCHEME_DBL_VAL(argv[0])));
-	} else {
-		scheme_signal_error("floor: arg must be a number");
+		return scheme_make_integer((int)floor(SCHEME_DBL_VAL(argv[0])));
 	}
+
+	scheme_signal_error("floor: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -597,10 +606,11 @@ ceiling(int argc, Scheme_Object *argv[])
 	if (SCHEME_INTP(argv[0])) {
 		return (argv[0]);
 	} else if (SCHEME_DBLP(argv[0])) {
-		return scheme_make_integer(ceil(SCHEME_DBL_VAL(argv[0])));
-	} else {
-		scheme_signal_error("ceiling: arg must be a number");
+		return scheme_make_integer((int)ceil(SCHEME_DBL_VAL(argv[0])));
 	}
+
+	scheme_signal_error("ceiling: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -612,9 +622,10 @@ truncate(int argc, Scheme_Object *argv[])
 		return (argv[0]);
 	} else if (SCHEME_DBLP(argv[0])) {
 		return scheme_make_integer((int)(SCHEME_DBL_VAL(argv[0])));
-	} else {
-		scheme_signal_error("truncate: arg must be a number");
 	}
+
+	scheme_signal_error("truncate: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -632,13 +643,14 @@ round_prim(int argc, Scheme_Object *argv[])
 		hf = fl + 0.5;
 
 		if (val > hf) {
-			return (scheme_make_integer(cl));
+			return (scheme_make_integer((int)cl));
 		} else {
-			return (scheme_make_integer(fl));
+			return (scheme_make_integer((int)fl));
 		}
-	} else {
-		scheme_signal_error("round: arg must be a number");
 	}
+
+	scheme_signal_error("round: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 GEN_UNARY_OP(exp_prim, exp, exp)
@@ -653,6 +665,7 @@ atan_prim(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1 || argc == 2), "atan: wrong number of args");
 	scheme_signal_error("atan: unimplemented");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -664,9 +677,10 @@ sqrt_prim(int argc, Scheme_Object *argv[])
 		return (scheme_make_double(sqrt(SCHEME_INT_VAL(argv[0]))));
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (scheme_make_double(sqrt(SCHEME_DBL_VAL(argv[0]))));
-	} else {
-		scheme_signal_error("sqrt: arg must be a number");
 	}
+
+	scheme_signal_error("sqrt: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 
@@ -681,9 +695,10 @@ exact_to_inexact(int argc, Scheme_Object *argv[])
 		return (scheme_make_double(SCHEME_INT_VAL(argv[0])));
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (argv[0]);
-	} else {
-		scheme_signal_error("exact->inexact: arg must be a number");
 	}
+
+	scheme_signal_error("exact->inexact: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -694,10 +709,11 @@ inexact_to_exact(int argc, Scheme_Object *argv[])
 	if (SCHEME_INTP(argv[0])) {
 		return (argv[0]);
 	} else if (SCHEME_DBLP(argv[0])) {
-		return (scheme_make_integer(SCHEME_DBL_VAL(argv[0])));
-	} else {
-		scheme_signal_error("inexact->exact: arg must be a number");
+		return (scheme_make_integer((int)SCHEME_DBL_VAL(argv[0])));
 	}
+
+	scheme_signal_error("inexact->exact: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *integer_to_string(int i, int radix);
@@ -721,6 +737,9 @@ number_to_string(int argc, Scheme_Object *argv[])
 	} else if (SCHEME_DBLP(argv[0])) {
 		return (double_to_string(SCHEME_DBL_VAL(argv[0])));
 	}
+
+	scheme_signal_error("number->string: arg must be a number");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
@@ -763,7 +782,9 @@ double_to_string(double d)
 static Scheme_Object *
 string_to_number(int argc, Scheme_Object *argv[])
 {
-	int base, val, len, is_float, i;
+	int base, is_float, i;
+	long int val;
+	size_t len;
 	char *ptr, *str;
 	double d;
 	SCHEME_ASSERT((argc == 1 || argc == 2), "string->number: wrong number of args");
@@ -807,7 +828,15 @@ string_to_number(int argc, Scheme_Object *argv[])
 		if ((ptr - str) < len) {
 			return (scheme_false);
 		} else {
-			return (scheme_make_integer(val));
+			if (val > INT_MAX) {
+				scheme_signal_error("string->number: overflow");
+			}
+
+			if (val < INT_MIN) {
+				scheme_signal_error("string->number: underflow");
+			}
+
+			return (scheme_make_integer((int)val));
 		}
 	}
 }

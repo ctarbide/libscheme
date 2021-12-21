@@ -32,7 +32,7 @@
 
 /* local function prototypes */
 
-static Scheme_Object *read_char(Scheme_Object *port);
+/* static Scheme_Object *read_char(Scheme_Object *port); */
 static Scheme_Object *read_list(Scheme_Object *port);
 static Scheme_Object *read_string(Scheme_Object *port);
 static Scheme_Object *read_quote(Scheme_Object *port);
@@ -164,6 +164,7 @@ start_over:
 	}
 }
 
+#if 0
 static Scheme_Object *
 read_char(Scheme_Object *port)
 {
@@ -176,17 +177,17 @@ read_char(Scheme_Object *port)
 		return (scheme_make_char(ch));
 	}
 }
+#endif
 
 /* "(" has already been read */
 static Scheme_Object *
 read_list(Scheme_Object *port)
 {
-	Scheme_Object *obj, *car, *cdr;
-	int ch;
+	Scheme_Object *car, *cdr;
 	skip_whitespace_comments(port);
 
 	if (peek_char(port) == ')') {
-		ch = scheme_getc(port);
+		scheme_getc(port);
 		return (scheme_null);
 	}
 
@@ -194,10 +195,10 @@ read_list(Scheme_Object *port)
 	skip_whitespace_comments(port);
 
 	if (peek_char(port) == ')') {
-		ch = scheme_getc(port);
+		scheme_getc(port);
 		cdr = scheme_null;
 	} else if ((peek_char(port) == '.') && isspace(double_peek_char(port))) {
-		ch = scheme_getc(port);
+		scheme_getc(port);
 		cdr = scheme_read(port);
 		skip_whitespace_comments(port);
 
@@ -205,7 +206,7 @@ read_list(Scheme_Object *port)
 			scheme_signal_error("read: malformed list");
 		}
 
-		ch = scheme_getc(port);
+		scheme_getc(port);
 	} else {
 		cdr = read_list(port);
 	}
@@ -217,8 +218,8 @@ read_list(Scheme_Object *port)
 static Scheme_Object *
 read_string(Scheme_Object *port)
 {
-	char ch, buf[MAX_STRING_SIZE];
-	int i;
+	char buf[MAX_STRING_SIZE];
+	int i, ch;
 	i = 0;
 
 	while ((ch = scheme_getc(port)) != '"') {
@@ -230,7 +231,7 @@ read_string(Scheme_Object *port)
 			scheme_signal_error("read: string too long for reader");
 		}
 
-		buf[i++] = ch;
+		buf[i++] = (char)ch;
 	}
 
 	buf[i] = '\0';
@@ -291,7 +292,7 @@ read_number(Scheme_Object *port)
 			is_float = 1;
 		}
 
-		buf[i++] = ch;
+		buf[i++] = (char)ch;
 	} while (isdigit(ch = scheme_getc(port)) || (ch == '.') || (ch == 'e') || (ch == 'E'));
 
 	scheme_ungetc(ch, port);
@@ -307,7 +308,6 @@ read_number(Scheme_Object *port)
 
 		return (scheme_make_double(d));
 	} else {
-		int i;
 		i = atoi(buf);
 
 		if (is_negative) {
@@ -397,7 +397,7 @@ read_symbol(Scheme_Object *port)
 		&& (ch != '"')
 		&& (ch != ';')
 		&& (ch != EOF)) {
-		buf[i++] = ch;
+		buf[i++] = (char)ch;
 	}
 
 	if (ch != EOF) {

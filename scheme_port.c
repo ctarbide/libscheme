@@ -137,10 +137,10 @@ scheme_make_eof(void)
 Scheme_Input_Port *
 scheme_make_input_port(Scheme_Object *subtype,
 	void *data,
-	int (*getc_fun)(Scheme_Input_Port*),
-	void (*ungetc_fun)(int, Scheme_Input_Port*),
-	int (*char_ready_fun)(Scheme_Input_Port*),
-	void (*close_fun)(Scheme_Input_Port*))
+	int (*getc_fun)(Scheme_Input_Port *),
+	void (*ungetc_fun)(int, Scheme_Input_Port *),
+	int (*char_ready_fun)(Scheme_Input_Port *),
+	void (*close_fun)(Scheme_Input_Port *))
 {
 	Scheme_Input_Port *ip;
 	ip = (Scheme_Input_Port *) scheme_malloc(sizeof(Scheme_Input_Port));
@@ -156,8 +156,8 @@ scheme_make_input_port(Scheme_Object *subtype,
 Scheme_Output_Port *
 scheme_make_output_port(Scheme_Object *subtype,
 	void *data,
-	void (*write_string_fun)(char *str, Scheme_Output_Port*),
-	void (*close_fun)(Scheme_Output_Port*))
+	void (*write_string_fun)(char *str, Scheme_Output_Port *),
+	void (*close_fun)(Scheme_Output_Port *))
 {
 	Scheme_Output_Port *op;
 	op = (Scheme_Output_Port *) scheme_malloc(sizeof(Scheme_Output_Port));
@@ -230,7 +230,6 @@ is_ready(int fd)
 {
 	fd_set fdset;
 	struct timeval timeout;
-	int ret;
 	FD_ZERO(&fdset);
 	FD_SET(fd, &fdset);
 	timeout.tv_sec = 0;
@@ -269,7 +268,6 @@ Scheme_Object *
 scheme_make_file_input_port(FILE *fp)
 {
 	Scheme_Object *port;
-	Scheme_Input_Port *ip;
 	port = scheme_alloc_object();
 	SCHEME_TYPE(port) = scheme_input_port_type;
 	SCHEME_PTR_VAL(port) =
@@ -326,9 +324,15 @@ static Scheme_Indexed_String *
 scheme_make_indexed_string(char *str)
 {
 	Scheme_Indexed_String *is;
+	size_t len = strlen(str);
+
+	if (len >= INT_MAX) {
+		scheme_signal_error("string too big: %"PRIzu" bytes long", len);
+	}
+
 	is = (Scheme_Indexed_String *) scheme_malloc(sizeof(Scheme_Indexed_String));
 	is->string = scheme_strdup(str);
-	is->size = strlen(str);
+	is->size = (int)len;
 	is->index = 0;
 	return (is);
 }
@@ -615,7 +619,7 @@ read_char(int argc, Scheme_Object *argv[])
 	if (ch == EOF) {
 		return (scheme_eof);
 	} else {
-		return (scheme_make_char(ch));
+		return (scheme_make_char((char)ch));
 	}
 }
 
@@ -639,7 +643,7 @@ peek_char(int argc, Scheme_Object *argv[])
 		return (scheme_eof);
 	} else {
 		scheme_ungetc(ch, port);
-		return (scheme_make_char(ch));
+		return (scheme_make_char((char)ch));
 	}
 }
 
@@ -783,6 +787,7 @@ flush_output(int argc, Scheme_Object *argv[])
 	return (scheme_true);
 }
 
+#if 0
 static Scheme_Object *
 write_to_string(int argc, Scheme_Object *argv[])
 {
@@ -800,4 +805,4 @@ display_to_string(int argc, Scheme_Object *argv[])
 	str = scheme_display_to_string(argv[0]);
 	return (scheme_make_string(str));
 }
-
+#endif

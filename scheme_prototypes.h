@@ -10,7 +10,7 @@ int scheme_eqv(Scheme_Object *obj1, Scheme_Object *obj2);
 int scheme_equal(Scheme_Object *obj1, Scheme_Object *obj2);
 /* scheme_char.c */
 void scheme_init_char(Scheme_Env *env);
-Scheme_Object *scheme_make_char(char ch);
+Scheme_Object *scheme_make_char(int ch);
 /* scheme_env.c */
 Scheme_Env *scheme_basic_env(void);
 void scheme_add_global(char *name, Scheme_Object *obj, Scheme_Env *env);
@@ -38,7 +38,7 @@ Scheme_Object *scheme_make_cont(void);
 Scheme_Object *scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands);
 Scheme_Object *scheme_apply_to_list(Scheme_Object *rator, Scheme_Object *rands);
 /* scheme_hash.c */
-Scheme_Hash_Table *scheme_hash_table(int size);
+Scheme_Hash_Table *scheme_hash_table(size_t size);
 void scheme_add_to_table(Scheme_Hash_Table *table, char *key, void *val);
 void *scheme_lookup_in_table(Scheme_Hash_Table *table, char *key);
 void scheme_change_in_table(Scheme_Hash_Table *table, char *key, void *new);
@@ -83,7 +83,7 @@ Scheme_Object *scheme_read(Scheme_Object *port);
 /* scheme_string.c */
 void scheme_init_string(Scheme_Env *env);
 Scheme_Object *scheme_make_string(char *chars);
-Scheme_Object *scheme_alloc_string(int size, char fill);
+Scheme_Object *scheme_alloc_string(size_t size, int fill);
 /* scheme_struct.c */
 void scheme_init_struct(Scheme_Env *env);
 Scheme_Object *scheme_apply_struct_proc(Scheme_Object *sp, Scheme_Object *args);

@@ -94,16 +94,16 @@ scheme_make_string(char *chars)
 }
 
 Scheme_Object *
-scheme_alloc_string(int size, char fill)
+scheme_alloc_string(size_t size, int fill)
 {
 	Scheme_Object *str;
 	int i;
 	str = scheme_alloc_object();
 	SCHEME_TYPE(str) = scheme_string_type;
-	SCHEME_STR_VAL(str) = (char *) scheme_malloc(sizeof(char) * (size + 1));
+	SCHEME_STR_VAL(str) = (char *) scheme_malloc(sizeof(char) * (size_t)(size + 1));
 
 	for (i = 0 ; i < size ; ++i) {
-		SCHEME_STR_VAL(str)[i] = fill;
+		SCHEME_STR_VAL(str)[i] = (char)fill;
 	}
 
 	SCHEME_STR_VAL(str)[i] = '\0';
@@ -122,12 +122,18 @@ string_p(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 make_string(int argc, Scheme_Object *argv[])
 {
-	int len;
-	char fill;
+	int i, fill;
+	size_t len;
 	Scheme_Object *str;
 	SCHEME_ASSERT((argc == 1) || (argc == 2), "make-string: wrong number of args");
 	SCHEME_ASSERT(SCHEME_INTP(argv[0]), "make-string: first arg must be integer");
-	len = SCHEME_INT_VAL(argv[0]);
+	i = SCHEME_INT_VAL(argv[0]);
+
+	if (i < 0) {
+		scheme_signal_error("make-string: index out of range: %d", i);
+	}
+
+	len = (size_t)i;
 
 	if (argc == 2) {
 		SCHEME_ASSERT(SCHEME_CHARP(argv[1]), "make-string: second arg must be character");
@@ -145,11 +151,11 @@ string(int argc, Scheme_Object *argv[])
 {
 	Scheme_Object *str;
 	int i;
-	str = scheme_alloc_string(argc, 0);
+	str = scheme_alloc_string((size_t)argc, 0);
 
 	for (i = 0 ; i < argc ; ++i) {
 		SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "string: args must all be characters");
-		SCHEME_STR_VAL(str)[i] = SCHEME_CHAR_VAL(argv[i]);
+		SCHEME_STR_VAL(str)[i] = (char)SCHEME_CHAR_VAL(argv[i]);
 	}
 
 	return (str);
@@ -160,13 +166,14 @@ string_length(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "string-length: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-length: arg must be a string");
-	return (scheme_make_integer(strlen(SCHEME_STR_VAL(argv[0]))));
+	return (scheme_make_integer((int)strlen(SCHEME_STR_VAL(argv[0]))));
 }
 
 static Scheme_Object *
 string_ref(int argc, Scheme_Object *argv[])
 {
-	int i, len;
+	int i;
+	size_t len;
 	char *str;
 	SCHEME_ASSERT((argc == 2), "string-ref: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-ref: first arg must be a string");
@@ -185,7 +192,8 @@ string_ref(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 string_set(int argc, Scheme_Object *argv[])
 {
-	int i, len;
+	int i;
+	size_t len;
 	char *str;
 	SCHEME_ASSERT((argc == 3), "string-set!: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-set!: first arg must be a string");
@@ -196,10 +204,10 @@ string_set(int argc, Scheme_Object *argv[])
 	i = SCHEME_INT_VAL(argv[1]);
 
 	if ((i < 0) || (i >= len)) {
-		scheme_signal_error("string-ref: index out of range: %d", i);
+		scheme_signal_error("string-set!: index out of range: %d", i);
 	}
 
-	str[i] = SCHEME_CHAR_VAL(argv[2]);
+	str[i] = (char)SCHEME_CHAR_VAL(argv[2]);
 	return (argv[0]);
 }
 
@@ -230,7 +238,8 @@ GEN_STRING_COMP(string_ci_gt_eq, "string-ci>=?", strcmp_ci, >=)
 static Scheme_Object *
 substring(int argc, Scheme_Object *argv[])
 {
-	int len, start, finish, i;
+	int start, finish, i;
+	size_t len;
 	char *chars;
 	Scheme_Object *str;
 	SCHEME_ASSERT((argc == 3), "substring: wrong number of args");
@@ -243,7 +252,7 @@ substring(int argc, Scheme_Object *argv[])
 	finish = SCHEME_INT_VAL(argv[2]);
 	SCHEME_ASSERT((start >= 0 && start <= len), "substring: first index out of bounds");
 	SCHEME_ASSERT((finish >= start && finish <= len), "substring: second index out of bounds");
-	str = scheme_alloc_string(finish - start, 0);
+	str = scheme_alloc_string((size_t)(finish - start), 0);
 
 	for (i = 0 ; i < finish - start ; ++i) {
 		SCHEME_STR_VAL(str)[i] = chars[i + start];
@@ -271,7 +280,7 @@ string_append(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 append_2(Scheme_Object *str1, Scheme_Object *str2)
 {
-	int len1, len2, i;
+	size_t len1, len2, i;
 	char *chars1, *chars2;
 	Scheme_Object *new;
 	SCHEME_ASSERT(SCHEME_STRINGP(str1) && SCHEME_STRINGP(str2),
@@ -298,7 +307,8 @@ append_2(Scheme_Object *str1, Scheme_Object *str2)
 static Scheme_Object *
 string_to_list(int argc, Scheme_Object *argv[])
 {
-	int len, i;
+	int i;
+	size_t len;
 	char *chars;
 	Scheme_Object *first, *last, *pair;
 	SCHEME_ASSERT(argc == 1, "string->list: wrong number of args");
@@ -324,19 +334,20 @@ string_to_list(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 list_to_string(int argc, Scheme_Object *argv[])
 {
-	int len, i;
+	int i;
+	size_t len;
 	Scheme_Object *list, *str, *ch;
 	SCHEME_ASSERT((argc == 1), "list->string: wrong number of args");
 	SCHEME_ASSERT(SCHEME_LISTP(argv[0]), "list->string: arg must be a list");
 	list = argv[0];
-	len = scheme_list_length(list);
+	len = (size_t)scheme_list_length(list);
 	str = scheme_alloc_string(len, 0);
 	i = 0;
 
 	while (! SCHEME_NULLP(list)) {
 		ch = SCHEME_CAR(list);
 		SCHEME_ASSERT(SCHEME_CHARP(ch), "list->string: all list elements must be characters");
-		SCHEME_STR_VAL(str)[i] = SCHEME_CHAR_VAL(ch);
+		SCHEME_STR_VAL(str)[i] = (char)SCHEME_CHAR_VAL(ch);
 		i++;
 		list = SCHEME_CDR(list);
 	}
@@ -357,8 +368,9 @@ string_copy(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 string_fill(int argc, Scheme_Object *argv[])
 {
-	int len, i;
-	char *chars, ch;
+	int i, ch;
+	size_t len;
+	char *chars;
 	SCHEME_ASSERT((argc == 2), "string-fill!: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-fill!: first arg must be a string");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[1]), "string-fill!: second arg must be a character");
@@ -367,7 +379,7 @@ string_fill(int argc, Scheme_Object *argv[])
 	len = strlen(chars);
 
 	for (i = 0 ; i < len ; ++i) {
-		chars[i] = ch;
+		chars[i] = (char)ch;
 	}
 
 	return (argv[0]);
@@ -378,8 +390,8 @@ strcmp_ci(char *str1, char *str2)
 {
 	while (*str1 && *str2) {
 		if (toupper(*str1) == toupper(*str2)) {
-			*str1++;
-			*str2++;
+			str1++;
+			str2++;
 			continue;
 		} else if (toupper(*str1) < toupper(*str2)) {
 			return -1;

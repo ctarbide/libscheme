@@ -99,20 +99,18 @@ scheme_apply_struct_proc(Scheme_Object *sp, Scheme_Object *args)
 		SCHEME_ASSERT((SCHEME_TYPE(inst) == proc->struct_type), "wrong type to getter function");
 		return (SCHEME_VEC_ELS(inst)[proc->slot_num] = SCHEME_CAR(SCHEME_CDR(args)));
 	}
-
-	default:
-		SCHEME_ASSERT((0), "unknown struct procedure type");
 	}
+
+	SCHEME_ASSERT((0), "unknown struct procedure type");
+	return NULL; /* never happens, avoid warning */
 }
 
 static Scheme_Object *
 define_struct_syntax(Scheme_Object *form, Scheme_Env *env)
 {
-	Scheme_Object *type_symbol, *field_symbols;
-	Scheme_Object *getters, *last_getter;
-	Scheme_Object *setters, *last_setter;
-	Scheme_Object *struct_symbol, *pred_symbol;
-	Scheme_Object *constructor_symbol, *type_obj;
+	Scheme_Object *field_symbols;
+	Scheme_Object *struct_symbol;
+	Scheme_Object *type_obj;
 	char *struct_name, *struct_type_name, *field_name;
 	int slot_num;
 	struct_symbol = SCHEME_CAR(SCHEME_CDR(form));
@@ -124,7 +122,6 @@ define_struct_syntax(Scheme_Object *form, Scheme_Env *env)
 	scheme_add_global(constructor_name(struct_name),
 		scheme_make_constructor(type_obj, scheme_list_length(field_symbols)), env);
 	scheme_add_global(pred_name(struct_name), scheme_make_pred(type_obj), env);
-	getters = last_getter = setters = last_setter = scheme_null;
 	slot_num = 0;
 
 	while (! SCHEME_NULLP(field_symbols)) {
@@ -146,7 +143,7 @@ scheme_make_instance(Scheme_Object *type, int num_fields)
 	inst = scheme_alloc_object();
 	SCHEME_TYPE(inst) = type;
 	SCHEME_VEC_SIZE(inst) = num_fields;
-	SCHEME_VEC_ELS(inst) = (Scheme_Object **) scheme_malloc(sizeof(Scheme_Object*));
+	SCHEME_VEC_ELS(inst) = (Scheme_Object **) scheme_malloc(sizeof(Scheme_Object *));
 	return (inst);
 }
 
@@ -192,7 +189,7 @@ scheme_make_setter(Scheme_Object *type, int field)
 static char *
 type_name(char *struct_name)
 {
-	int orig_len, add_len;
+	size_t orig_len, add_len;
 	char *name;
 	orig_len = strlen(struct_name);
 	add_len = 2;			/* strlen("<") + strlen(">") */
@@ -208,7 +205,7 @@ type_name(char *struct_name)
 static char *
 constructor_name(char *struct_name)
 {
-	int orig_len, make_len;
+	size_t orig_len, make_len;
 	char *name;
 	orig_len = strlen(struct_name);
 	make_len = 5;			/* strlen ("make-") */
@@ -221,7 +218,7 @@ constructor_name(char *struct_name)
 static char *
 pred_name(char *struct_name)
 {
-	int orig_len;
+	size_t orig_len;
 	char *name;
 	orig_len = strlen(struct_name);
 	name = (char *) scheme_malloc(sizeof(char) * (orig_len + 1 + 1));
@@ -234,7 +231,7 @@ pred_name(char *struct_name)
 static char *
 getter_name(char *struct_name, char *field_name)
 {
-	int name_len, field_len, dash_len;
+	size_t name_len, field_len, dash_len;
 	char *name;
 	name_len = strlen(struct_name);
 	field_len = strlen(field_name);
@@ -249,7 +246,7 @@ getter_name(char *struct_name, char *field_name)
 static char *
 setter_name(char *struct_name, char *field_name)
 {
-	int set_len, name_len, field_len, dash_len, bang_len;
+	size_t set_len, name_len, field_len, dash_len, bang_len;
 	char *name;
 	name_len = strlen(struct_name);
 	field_len = strlen(field_name);

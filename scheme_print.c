@@ -101,33 +101,33 @@ print(char *str, int index, Scheme_Object *obj, int escaped)
 
 	if (type == scheme_type_type || type == scheme_symbol_type) {
 		sprintf((str + index), "%s", SCHEME_STR_VAL(obj));
-		index += strlen(SCHEME_STR_VAL(obj));
+		index += (int)strlen(SCHEME_STR_VAL(obj));
 	} else if (type == scheme_string_type) {
 		index = print_string(str, index, obj, escaped);
 	} else if (type == scheme_char_type) {
 		index = print_char(str, index, obj, escaped);
 	} else if (type == scheme_integer_type) {
-		sprintf((str + index), "%d", SCHEME_INT_VAL(obj));
-		index += strlen(str + index);
+		sprintf(str + index, "%d", SCHEME_INT_VAL(obj));
+		index += (int)strlen(str + index);
 	} else if (type == scheme_double_type) {
-		sprintf((str + index), "%f", SCHEME_DBL_VAL(obj));
-		index += strlen(str + index);
+		sprintf(str + index, "%f", SCHEME_DBL_VAL(obj));
+		index += (int)strlen(str + index);
 	} else if (type == scheme_null_type) {
-		sprintf((str + index), "()");
+		sprintf(str + index, "()");
 		index += 2;
 	} else if (type == scheme_pair_type) {
 		index = print_pair(str, index, obj, escaped);
 	} else if (type == scheme_vector_type) {
 		index = print_vector(str, index, obj, escaped);
 	} else if (type == scheme_true_type) {
-		sprintf((str + index), "#t");
+		sprintf(str + index, "#t");
 		index += 2;
 	} else if (type == scheme_false_type) {
-		sprintf((str + index), "#f");
+		sprintf(str + index, "#f");
 		index += 2;
 	} else {
-		sprintf((str + index), "#%s", SCHEME_STR_VAL(SCHEME_TYPE(obj)));
-		index += strlen(str + index);
+		sprintf(str + index, "#%s", SCHEME_STR_VAL(SCHEME_TYPE(obj)));
+		index += (int)strlen(str + index);
 	}
 
 	return (index);
@@ -149,7 +149,7 @@ print_string(char *buf, int index, Scheme_Object *string, int escaped)
 		}
 
 		buf[index++] = *str;
-		*str++;
+		str++;
 	}
 
 	if (escaped) {
@@ -163,7 +163,6 @@ static int
 print_pair(char *str, int index, Scheme_Object *pair, int escaped)
 {
 	Scheme_Object *cdr;
-	int num_chars;
 	str[index++] = '(';
 	index = print(str, index, SCHEME_CAR(pair), escaped);
 	cdr = SCHEME_CDR(pair);
@@ -207,49 +206,48 @@ print_vector(char *str, int index, Scheme_Object *vec, int escaped)
 static int
 print_char(char *str, int index, Scheme_Object *charobj, int escaped)
 {
-	char ch;
-	int num_chars;
+	int ch;
 	ch = SCHEME_CHAR_VAL(charobj);
 
 	if (escaped) {
 		switch (ch) {
 		case '\n':
-			sprintf((str + index), "#\\newline");
+			sprintf(str + index, "#\\newline");
 			index += 9;
 			break;
 
 		case '\t':
-			sprintf((str + index), "#\\tab");
+			sprintf(str + index, "#\\tab");
 			index += 5;
 			break;
 
 		case ' ':
-			sprintf((str + index), "#\\space");
+			sprintf(str + index, "#\\space");
 			index += 7;
 			break;
 
 		case '\r':
-			sprintf((str + index), "#\\return");
+			sprintf(str + index, "#\\return");
 			index += 8;
 			break;
 
 		case '\f':
-			sprintf((str + index), "#\\page");
+			sprintf(str + index, "#\\page");
 			index += 6;
 			break;
 
 		case '\b':
-			sprintf((str + index), "#\\backspace");
+			sprintf(str + index, "#\\backspace");
 			index += 11;
 			break;
 
 		default:
-			sprintf((str + index), "#\\%c", ch);
+			sprintf(str + index, "#\\%c", ch);
 			index += 3;
 			break;
 		}
 	} else {
-		str[index++] = ch;
+		str[index++] = (char)ch;
 	}
 
 	return (index);

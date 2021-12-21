@@ -116,7 +116,7 @@ downcase(char *str)
 	new = scheme_strdup(str);
 
 	while (new[i]) {
-		new[i] = tolower(new[i]);
+		new[i] = (char)tolower(new[i]);
 		i++;
 	}
 

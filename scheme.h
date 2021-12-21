@@ -38,8 +38,36 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <limits.h>
 
 #include <sys/select.h>
+
+#ifdef _MSC_VER
+typedef  __int8  int8_t;
+typedef __int16 int16_t;
+typedef __int32 int32_t;
+typedef __int64 int64_t;
+typedef unsigned  __int8  uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+/* assumes msinttypes is available
+ */
+#include <inttypes.h>
+#if (_MSC_VER >= 1100 && _MSC_VER < 1900)
+/* MSVC++  5.0, _MSC_VER == 1100, Visual Studio 5.0
+ * MSVC++ 14.0, _MSC_VER == 1900, Visual Studio 2015
+ * See also: https://github.com/MicrosoftDocs/cpp-docs/issues/1490
+ */
+#define PRIzu "I"
+#else
+#define PRIzu "zu"
+#endif
+#else
+#include <inttypes.h>
+#define PRIzu "zu"
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -54,7 +82,7 @@ struct Scheme_Bucket {
 typedef struct Scheme_Bucket Scheme_Bucket;
 
 struct Scheme_Hash_Table {
-	int size;
+	size_t size;
 	Scheme_Bucket **buckets;
 };
 typedef struct Scheme_Hash_Table Scheme_Hash_Table;
@@ -77,7 +105,7 @@ typedef struct Scheme_Cont Scheme_Cont;
 
 struct Scheme_Object {
 	union {
-		char char_val;
+		int char_val;
 		int int_val;
 		double double_val;
 		char *string_val;

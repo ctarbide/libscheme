@@ -144,17 +144,15 @@ name (int argc, Scheme_Object *argv[]) \
   if (SCHEME_INTP(n1)) \
     { \
       if (SCHEME_INTP(n2)) \
-	return (scheme_make_integer (c_name (SCHEME_INT_VAL(n1), SCHEME_INT_VAL(n2)))); \
+	return (scheme_make_integer((int) c_name (SCHEME_INT_VAL(n1), SCHEME_INT_VAL(n2)))); \
       else \
-        return (scheme_make_double (c_name (SCHEME_INT_VAL(n1), SCHEME_DBL_VAL(n2)))); \
+        return (scheme_make_double(c_name (SCHEME_INT_VAL(n1), SCHEME_DBL_VAL(n2)))); \
     } \
   else \
     { \
       if (SCHEME_INTP(n2)) \
-        return (scheme_make_double (c_name (SCHEME_DBL_VAL(n1), SCHEME_INT_VAL(n2)))); \
+        return (scheme_make_double(c_name (SCHEME_DBL_VAL(n1), SCHEME_INT_VAL(n2)))); \
       else \
-        return (scheme_make_double (c_name (SCHEME_DBL_VAL(n1), SCHEME_DBL_VAL(n2)))); \
+        return (scheme_make_double(c_name (SCHEME_DBL_VAL(n1), SCHEME_DBL_VAL(n2)))); \
     } \
 }
-
-
