@@ -61,7 +61,7 @@ scheme_write_to_string(Scheme_Object *obj)
 	int index = 0;
 	index = print(print_buffer, index, obj, 1);
 	print_buffer[index] = '\0';
-	return (scheme_strdup(print_buffer));
+	return scheme_strdup(print_buffer);
 }
 
 char *
@@ -70,7 +70,7 @@ scheme_display_to_string(Scheme_Object *obj)
 	int index = 0;
 	index = print(print_buffer, index, obj, 0);
 	print_buffer[index] = '\0';
-	return (scheme_strdup(print_buffer));
+	return scheme_strdup(print_buffer);
 }
 
 void
@@ -130,7 +130,7 @@ print(char *str, int index, Scheme_Object *obj, int escaped)
 		index += (int)strlen(str + index);
 	}
 
-	return (index);
+	return index;
 }
 
 static int
@@ -156,7 +156,7 @@ print_string(char *buf, int index, Scheme_Object *string, int escaped)
 		buf[index++] = '"';
 	}
 
-	return (index);
+	return index;
 }
 
 static int
@@ -181,7 +181,7 @@ print_pair(char *str, int index, Scheme_Object *pair, int escaped)
 	}
 
 	str[index++] = ')';
-	return (index);
+	return index;
 }
 
 static int
@@ -200,7 +200,7 @@ print_vector(char *str, int index, Scheme_Object *vec, int escaped)
 	}
 
 	str[index++] = ')';
-	return (index);
+	return index;
 }
 
 static int
@@ -250,5 +250,5 @@ print_char(char *str, int index, Scheme_Object *charobj, int escaped)
 		str[index++] = (char)ch;
 	}
 
-	return (index);
+	return index;
 }

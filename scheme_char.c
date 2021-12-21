@@ -84,7 +84,7 @@ scheme_make_char(int ch)
 	sc = scheme_alloc_object();
 	SCHEME_TYPE(sc) = scheme_char_type;
 	SCHEME_CHAR_VAL(sc) = ch;
-	return (sc);
+	return sc;
 }
 
 /* locals */
@@ -93,7 +93,7 @@ static Scheme_Object *
 char_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char?: wrong number of args");
-	return (SCHEME_CHARP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_CHARP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -201,7 +201,7 @@ char_alphabetic(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-alphabetic?: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-alphabetic?: arg must be a character");
-	return (isalpha(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false);
+	return isalpha(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -209,7 +209,7 @@ char_numeric(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-numeric?: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-numeric?: arg must be a character");
-	return (isdigit(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false);
+	return isdigit(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -217,7 +217,7 @@ char_whitespace(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-whitespace?: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-whitespace?: arg must be a character");
-	return (isspace(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false);
+	return isspace(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -225,7 +225,7 @@ char_upper_case(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-upper-case?: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-upper-case?: arg must be a character");
-	return (isupper(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false);
+	return isupper(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -233,7 +233,7 @@ char_lower_case(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-lower-case?: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-lower-case?: arg must be a character");
-	return (islower(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false);
+	return islower(SCHEME_CHAR_VAL(argv[0])) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -241,7 +241,7 @@ char_to_integer(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char->integer: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char->integer: arg must be a character");
-	return (scheme_make_integer(SCHEME_CHAR_VAL(argv[0])));
+	return scheme_make_integer(SCHEME_CHAR_VAL(argv[0]));
 }
 
 static Scheme_Object *
@@ -249,7 +249,7 @@ integer_to_char(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "integer->char: wrong number of args");
 	SCHEME_ASSERT(SCHEME_INTP(argv[0]), "integer->char: arg must be an integer");
-	return (scheme_make_char((char)SCHEME_INT_VAL(argv[0])));
+	return scheme_make_char((char)SCHEME_INT_VAL(argv[0]));
 }
 
 static Scheme_Object *
@@ -257,7 +257,7 @@ char_upcase(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-upcase: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-upcase: arg must be a character");
-	return (scheme_make_char((char)toupper(SCHEME_CHAR_VAL(argv[0]))));
+	return scheme_make_char((char)toupper(SCHEME_CHAR_VAL(argv[0])));
 }
 
 static Scheme_Object *
@@ -265,5 +265,5 @@ char_downcase(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-downcase: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-downcase: arg must be a character");
-	return (scheme_make_char((char)tolower(SCHEME_CHAR_VAL(argv[0]))));
+	return scheme_make_char((char)tolower(SCHEME_CHAR_VAL(argv[0])));
 }

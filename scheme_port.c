@@ -131,7 +131,7 @@ scheme_make_eof(void)
 	Scheme_Object *eof;
 	eof = scheme_alloc_object();
 	SCHEME_TYPE(eof) = scheme_eof_type;
-	return (eof);
+	return eof;
 }
 
 Scheme_Input_Port *
@@ -150,7 +150,7 @@ scheme_make_input_port(Scheme_Object *subtype,
 	ip->ungetc_fun = ungetc_fun;
 	ip->char_ready_fun = char_ready_fun;
 	ip->close_fun = close_fun;
-	return (ip);
+	return ip;
 }
 
 Scheme_Output_Port *
@@ -165,7 +165,7 @@ scheme_make_output_port(Scheme_Object *subtype,
 	op->port_data = data;
 	op->write_string_fun = write_string_fun;
 	op->close_fun = close_fun;
-	return (op);
+	return op;
 }
 
 int
@@ -173,7 +173,7 @@ scheme_getc(Scheme_Object *port)
 {
 	Scheme_Input_Port *ip;
 	ip = (Scheme_Input_Port *) SCHEME_PTR_VAL(port);
-	return ((ip->getc_fun)(ip));
+	return (ip->getc_fun)(ip);
 }
 
 void
@@ -189,7 +189,7 @@ scheme_char_ready(Scheme_Object *port)
 {
 	Scheme_Input_Port *ip;
 	ip = (Scheme_Input_Port *) SCHEME_PTR_VAL(port);
-	return ((ip->char_ready_fun)(ip));
+	return (ip->char_ready_fun)(ip);
 }
 
 void
@@ -213,7 +213,7 @@ scheme_close_output_port(Scheme_Object *port)
 static int
 file_getc(Scheme_Input_Port *port)
 {
-	return (fgetc((FILE *)port->port_data));
+	return fgetc((FILE *)port->port_data);
 }
 
 static void
@@ -243,9 +243,9 @@ file_char_ready(Scheme_Input_Port *port)
 {
 	FILE *fp = (FILE *) port->port_data;
 #ifdef HAS_STANDARD_IOB
-	return (fp->_cnt);
+	return fp->_cnt;
 #elif HAS_GNU_IOB
-	return (fp->_egptr - fp->_gptr);
+	return fp->_egptr - fp->_gptr;
 #else
 	/* scheme_warning ("char-ready? always returns #f on this platform"); */
 	/* return (scheme_false); */
@@ -277,7 +277,7 @@ scheme_make_file_input_port(FILE *fp)
 			file_ungetc,
 			file_char_ready,
 			file_close_input);
-	return (port);
+	return port;
 }
 
 /* string input ports */
@@ -289,9 +289,9 @@ string_getc(Scheme_Input_Port *port)
 	is = (Scheme_Indexed_String *) port->port_data;
 
 	if (is->index >= is->size) {
-		return (EOF);
+		return EOF;
 	} else {
-		return (is->string[is->index++]);
+		return is->string[is->index++];
 	}
 }
 
@@ -311,7 +311,7 @@ string_char_ready(Scheme_Input_Port *port)
 {
 	Scheme_Indexed_String *is;
 	is = (Scheme_Indexed_String *) port->port_data;
-	return (is->index < is->size);
+	return is->index < is->size;
 }
 
 static void
@@ -334,7 +334,7 @@ scheme_make_indexed_string(char *str)
 	is->string = scheme_strdup(str);
 	is->size = (int)len;
 	is->index = 0;
-	return (is);
+	return is;
 }
 
 Scheme_Object *
@@ -350,7 +350,7 @@ scheme_make_string_input_port(char *str)
 			string_ungetc,
 			string_char_ready,
 			string_close);
-	return (port);
+	return port;
 }
 
 /* file output ports */
@@ -380,7 +380,7 @@ scheme_make_file_output_port(FILE *fp)
 			fp,
 			file_write_string,
 			file_close_output);
-	return (port);
+	return port;
 }
 
 static Scheme_Object *
@@ -404,7 +404,7 @@ call_with_input_file(int argc, Scheme_Object *argv[])
 	port = scheme_make_file_input_port(fp);
 	ret = scheme_apply_to_list(argv[1], scheme_make_pair(port, scheme_null));
 	fclose(fp);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -428,35 +428,35 @@ call_with_output_file(int argc, Scheme_Object *argv[])
 	port = scheme_make_file_output_port(fp);
 	ret = scheme_apply_to_list(argv[1], scheme_make_pair(port, scheme_null));
 	fclose(fp);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
 input_port_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "input-port?: wrong number of args");
-	return (SCHEME_INPORTP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_INPORTP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
 output_port_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "output-port?: wrong number of args");
-	return (SCHEME_OUTPORTP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_OUTPORTP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
 current_input_port(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 0), "current-input-port: wrong number of args");
-	return (cur_in_port);
+	return cur_in_port;
 }
 
 static Scheme_Object *
 current_output_port(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 0), "current-output-port: wrong number of args");
-	return (cur_out_port);
+	return cur_out_port;
 }
 
 static Scheme_Object *
@@ -483,7 +483,7 @@ with_input_from_file(int argc, Scheme_Object *argv[])
 	ret = scheme_apply(argv[1], 0, NULL);
 	cur_in_port = old_port;
 	scheme_close_input_port(new_port);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -503,7 +503,7 @@ with_input_from_string(int argc, Scheme_Object *argv[])
 	ret = scheme_apply(argv[1], 0, NULL);
 	cur_in_port = old_port;
 	scheme_close_input_port(new_port);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -529,7 +529,7 @@ with_output_to_file(int argc, Scheme_Object *argv[])
 	ret = scheme_apply_to_list(argv[1], scheme_null);
 	SCHEME_PTR_VAL(cur_out_port) = old;
 	fclose(fp);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -544,7 +544,7 @@ open_input_file(int argc, Scheme_Object *argv[])
 		scheme_signal_error("Cannot open input file %s", SCHEME_STR_VAL(argv[0]));
 	}
 
-	return (scheme_make_file_input_port(fp));
+	return scheme_make_file_input_port(fp);
 }
 
 static Scheme_Object *
@@ -554,7 +554,7 @@ open_input_string(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 1), "open-input-string: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "open-input-string: arg must be a string");
 	str = SCHEME_STR_VAL(argv[0]);
-	return (scheme_make_string_input_port(str));
+	return scheme_make_string_input_port(str);
 }
 
 static Scheme_Object *
@@ -569,7 +569,7 @@ open_output_file(int argc, Scheme_Object *argv[])
 		scheme_signal_error("Cannot open output file %s", SCHEME_STR_VAL(argv[0]));
 	}
 
-	return (scheme_make_file_output_port(fp));
+	return scheme_make_file_output_port(fp);
 }
 
 static Scheme_Object *
@@ -578,7 +578,7 @@ close_input_port(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 1), "close-input-port: wrong number of args");
 	SCHEME_ASSERT(SCHEME_INPORTP(argv[0]), "close-input-port: arg must be an input port");
 	scheme_close_input_port(argv[0]);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -587,7 +587,7 @@ close_output_port(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 1), "close-output-port: wrong number of args");
 	SCHEME_ASSERT(SCHEME_OUTPORTP(argv[0]), "close-output-port: arg must be an output port");
 	scheme_close_output_port(argv[0]);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -597,9 +597,9 @@ read(int argc, Scheme_Object *argv[])
 
 	if (argc == 1) {
 		SCHEME_ASSERT(SCHEME_INPORTP(argv[0]), "read: arg must be an input port");
-		return (scheme_read(argv[0]));
+		return scheme_read(argv[0]);
 	} else {
-		return (scheme_read(cur_in_port));
+		return scheme_read(cur_in_port);
 	}
 }
 
@@ -617,9 +617,9 @@ read_char(int argc, Scheme_Object *argv[])
 	}
 
 	if (ch == EOF) {
-		return (scheme_eof);
+		return scheme_eof;
 	} else {
-		return (scheme_make_char((char)ch));
+		return scheme_make_char((char)ch);
 	}
 }
 
@@ -640,10 +640,10 @@ peek_char(int argc, Scheme_Object *argv[])
 	ch = scheme_getc(port);
 
 	if (ch == EOF) {
-		return (scheme_eof);
+		return scheme_eof;
 	} else {
 		scheme_ungetc(ch, port);
-		return (scheme_make_char((char)ch));
+		return scheme_make_char((char)ch);
 	}
 }
 
@@ -651,7 +651,7 @@ static Scheme_Object *
 eof_object_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "eof-object?: wrong number of args");
-	return (SCHEME_EOFP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_EOFP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -668,9 +668,9 @@ char_ready_p(int argc, Scheme_Object *argv[])
 	}
 
 	if (scheme_char_ready(port)) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
@@ -688,7 +688,7 @@ write(int argc, Scheme_Object *argv[])
 	}
 
 	scheme_write(argv[0], port);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -705,7 +705,7 @@ display(int argc, Scheme_Object *argv[])
 	}
 
 	scheme_display(argv[0], port);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -722,7 +722,7 @@ newline(int argc, Scheme_Object *argv[])
 	}
 
 	scheme_write_string("\n", port);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -742,7 +742,7 @@ write_char(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "write-char: first arg must be a character");
 	sprintf(buf, "%c", SCHEME_CHAR_VAL(argv[0]));
 	scheme_write_string(buf, port);
-	return (scheme_true);
+	return scheme_true;
 }
 
 static Scheme_Object *
@@ -772,7 +772,7 @@ load(int argc, Scheme_Object *argv[])
 
 	printf("; done loading %s\n", filename);
 	fclose(fp);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -784,7 +784,7 @@ flush_output(int argc, Scheme_Object *argv[])
 	fflush((FILE *)SCHEME_PTR_VAL(argv[0]));
 #endif
 	scheme_warning("flush-output temporarily disabled");
-	return (scheme_true);
+	return scheme_true;
 }
 
 #if 0
@@ -794,7 +794,7 @@ write_to_string(int argc, Scheme_Object *argv[])
 	char *str;
 	SCHEME_ASSERT((argc == 1), "write-to-string: wrong number of args");
 	str = scheme_write_to_string(argv[0]);
-	return (scheme_make_string(str));
+	return scheme_make_string(str);
 }
 
 static Scheme_Object *
@@ -803,6 +803,6 @@ display_to_string(int argc, Scheme_Object *argv[])
 	char *str;
 	SCHEME_ASSERT((argc == 1), "display-to-string: wrong number of args");
 	str = scheme_display_to_string(argv[0]);
-	return (scheme_make_string(str));
+	return scheme_make_string(str);
 }
 #endif

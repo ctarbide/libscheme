@@ -57,7 +57,7 @@ scheme_make_promise(Scheme_Object *expr, Scheme_Env *env)
 	obj = scheme_alloc_object();
 	SCHEME_TYPE(obj) = scheme_promise_type;
 	SCHEME_PTR_VAL(obj) = promise;
-	return (obj);
+	return obj;
 }
 
 static Scheme_Object *
@@ -69,9 +69,9 @@ force(int argc, Scheme_Object *argv[])
 	promise = (Scheme_Promise *) SCHEME_PTR_VAL(argv[0]);
 
 	if (promise->forced) {
-		return (promise->val);
+		return promise->val;
 	} else {
 		promise->val = scheme_eval(promise->val, promise->env);
-		return (promise->val);
+		return promise->val;
 	}
 }

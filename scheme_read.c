@@ -64,35 +64,35 @@ start_over:
 
 	switch (ch) {
 	case EOF:
-		return (scheme_eof);
+		return scheme_eof;
 
 	case ')':
 		scheme_signal_error("read: unexpected ')'");
 
 	case '(':
-		return (read_list(port));
+		return read_list(port);
 
 	case '"':
-		return (read_string(port));
+		return read_string(port);
 
 	case '\'':
-		return (read_quote(port));
+		return read_quote(port);
 
 	case '`':
-		return (read_quasiquote(port));
+		return read_quasiquote(port);
 
 	case ',':
 		if (peek_char(port) == '@') {
 			ch = scheme_getc(port);
-			return (read_unquote_splicing(port));
+			return read_unquote_splicing(port);
 		} else {
-			return (read_unquote(port));
+			return read_unquote(port);
 		}
 
 	case ';':
 		while ((ch = scheme_getc(port)) != '\n') {
 			if (ch == EOF) {
-				return (scheme_eof);
+				return scheme_eof;
 			}
 		}
 
@@ -102,10 +102,10 @@ start_over:
 	case '-':
 		if (isdigit(peek_char(port))) {
 			scheme_ungetc(ch, port);
-			return (read_number(port));
+			return read_number(port);
 		} else {
 			scheme_ungetc(ch, port);
-			return (read_symbol(port));
+			return read_symbol(port);
 		}
 
 	case '#':
@@ -113,25 +113,25 @@ start_over:
 
 		switch (ch) {
 		case '(':
-			return (read_vector(port));
+			return read_vector(port);
 
 		case '\\':
-			return (read_character(port));
+			return read_character(port);
 
 		case 't':
-			return (scheme_true);
+			return scheme_true;
 
 		case 'f':
-			return (scheme_false);
+			return scheme_false;
 
 		case 'x':
-			return (read_hex_number(port));
+			return read_hex_number(port);
 
 		case 'b':
-			return (read_binary_number(port));
+			return read_binary_number(port);
 
 		case 'o':
-			return (read_octal_number(port));
+			return read_octal_number(port);
 
 		case '|':
 			do {
@@ -156,10 +156,10 @@ start_over:
 	default:
 		if (isdigit(ch)) {
 			scheme_ungetc(ch, port);
-			return (read_number(port));
+			return read_number(port);
 		} else {
 			scheme_ungetc(ch, port);
-			return (read_symbol(port));
+			return read_symbol(port);
 		}
 	}
 }
@@ -172,9 +172,9 @@ read_char(Scheme_Object *port)
 	ch = scheme_getc(port);
 
 	if (ch == EOF) {
-		return (scheme_eof);
+		return scheme_eof;
 	} else {
-		return (scheme_make_char(ch));
+		return scheme_make_char(ch);
 	}
 }
 #endif
@@ -188,7 +188,7 @@ read_list(Scheme_Object *port)
 
 	if (peek_char(port) == ')') {
 		scheme_getc(port);
-		return (scheme_null);
+		return scheme_null;
 	}
 
 	car = scheme_read(port);
@@ -211,7 +211,7 @@ read_list(Scheme_Object *port)
 		cdr = read_list(port);
 	}
 
-	return (scheme_make_pair(car, cdr));
+	return scheme_make_pair(car, cdr);
 }
 
 /* '"' has already been read */
@@ -235,7 +235,7 @@ read_string(Scheme_Object *port)
 	}
 
 	buf[i] = '\0';
-	return (scheme_make_string(buf));
+	return scheme_make_string(buf);
 }
 
 /* "'" has been read */
@@ -263,7 +263,7 @@ read_vector(Scheme_Object *port)
 		obj = SCHEME_CDR(obj);
 	}
 
-	return (vec);
+	return vec;
 }
 
 /* nothing has been read */
@@ -306,7 +306,7 @@ read_number(Scheme_Object *port)
 			d = -d;
 		}
 
-		return (scheme_make_double(d));
+		return scheme_make_double(d);
 	} else {
 		i = atoi(buf);
 
@@ -314,7 +314,7 @@ read_number(Scheme_Object *port)
 			i = -i;
 		}
 
-		return (scheme_make_integer(i));
+		return scheme_make_integer(i);
 	}
 }
 
@@ -340,7 +340,7 @@ read_hex_number(Scheme_Object *port)
 			}
 		} else {
 			scheme_ungetc(ch, port);
-			return (scheme_make_integer(i));
+			return scheme_make_integer(i);
 		}
 	}
 }
@@ -359,7 +359,7 @@ read_binary_number(Scheme_Object *port)
 			i += ch - '0';
 		} else {
 			scheme_ungetc(ch, port);
-			return (scheme_make_integer(i));
+			return scheme_make_integer(i);
 		}
 	}
 }
@@ -378,7 +378,7 @@ read_octal_number(Scheme_Object *port)
 			i += ch - '0';
 		} else {
 			scheme_ungetc(ch, port);
-			return (scheme_make_integer(i));
+			return scheme_make_integer(i);
 		}
 	}
 }
@@ -405,7 +405,7 @@ read_symbol(Scheme_Object *port)
 	}
 
 	buf[i] = '\0';
-	return (scheme_intern_symbol((char *)&buf));
+	return scheme_intern_symbol((char *)&buf);
 }
 
 /* "#\" has been read */
@@ -422,10 +422,10 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "ewline")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char('\n'));
+				return scheme_make_char('\n');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 's': /* maybe `space' */
@@ -434,10 +434,10 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "pace")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char(' '));
+				return scheme_make_char(' ');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 'r': /* maybe `rubout' */
@@ -446,16 +446,16 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "ubout")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char(0x7f));
+				return scheme_make_char(0x7f);
 			}
 		} else if ((peek_char(port) == 'e') || (peek_char(port) == 'E')) {
 			if (! match_chars(port, "eturn")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char('\r'));
+				return scheme_make_char('\r');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 'p': /* maybe `page' */
@@ -464,10 +464,10 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "age")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char('\f'));
+				return scheme_make_char('\f');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 't': /* maybe `tab' */
@@ -476,10 +476,10 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "ab")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char('\t'));
+				return scheme_make_char('\t');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 'b': /* maybe `backspace' */
@@ -488,10 +488,10 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "ackspace")) {
 				scheme_signal_error("read: bad character constant", NULL);
 			} else {
-				return (scheme_make_char('\b'));
+				return scheme_make_char('\b');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	case 'l': /* maybe `linefeed' */
@@ -500,14 +500,14 @@ read_character(Scheme_Object *port)
 			if (! match_chars(port, "inefeed")) {
 				scheme_signal_error("read: bad character constant");
 			} else {
-				return (scheme_make_char('\n'));
+				return scheme_make_char('\n');
 			}
 		} else {
-			return (scheme_make_char(ch));
+			return scheme_make_char(ch);
 		}
 
 	default:
-		return (scheme_make_char(ch));
+		return scheme_make_char(ch);
 	}
 }
 
@@ -519,7 +519,7 @@ read_quasiquote(Scheme_Object *port)
 	quoted_obj = scheme_read(port);
 	ret = scheme_make_pair(scheme_quasiquote_symbol,
 			scheme_make_pair(quoted_obj, scheme_null));
-	return (ret);
+	return ret;
 }
 
 /* "," has been read */
@@ -530,7 +530,7 @@ read_unquote(Scheme_Object *port)
 	obj = scheme_read(port);
 	ret = scheme_make_pair(scheme_unquote_symbol,
 			scheme_make_pair(obj, scheme_null));
-	return (ret);
+	return ret;
 }
 
 /* ",@" has been read */
@@ -541,7 +541,7 @@ read_unquote_splicing(Scheme_Object *port)
 	obj = scheme_read(port);
 	ret = scheme_make_pair(scheme_unquote_splicing_symbol,
 			scheme_make_pair(obj, scheme_null));
-	return (ret);
+	return ret;
 }
 
 /* utilities */
@@ -569,7 +569,7 @@ peek_char(Scheme_Object *port)
 	int ch;
 	ch = scheme_getc(port);
 	scheme_ungetc(ch, port);
-	return (ch);
+	return ch;
 }
 
 static int
@@ -580,7 +580,7 @@ double_peek_char(Scheme_Object *port)
 	ch2 = scheme_getc(port);
 	scheme_ungetc(ch2, port);
 	scheme_ungetc(ch1, port);
-	return (ch2);
+	return ch2;
 }
 
 static int
@@ -594,11 +594,11 @@ match_chars(Scheme_Object *port, char *str)
 		ch = scheme_getc(port);
 
 		if (tolower(ch) != tolower(str[i])) {
-			return (0);
+			return 0;
 		}
 
 		i++;
 	}
 
-	return (1);
+	return 1;
 }

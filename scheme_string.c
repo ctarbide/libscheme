@@ -90,7 +90,7 @@ scheme_make_string(char *chars)
 	str = scheme_alloc_object();
 	SCHEME_TYPE(str) = scheme_string_type;
 	SCHEME_STR_VAL(str) = scheme_strdup(chars);
-	return (str);
+	return str;
 }
 
 Scheme_Object *
@@ -107,7 +107,7 @@ scheme_alloc_string(size_t size, int fill)
 	}
 
 	SCHEME_STR_VAL(str)[i] = '\0';
-	return (str);
+	return str;
 }
 
 /* locals */
@@ -116,7 +116,7 @@ static Scheme_Object *
 string_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "string?: wrong number of args");
-	return (SCHEME_STRINGP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_STRINGP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -143,7 +143,7 @@ make_string(int argc, Scheme_Object *argv[])
 	}
 
 	str = scheme_alloc_string(len, fill);
-	return (str);
+	return str;
 }
 
 static Scheme_Object *
@@ -158,7 +158,7 @@ string(int argc, Scheme_Object *argv[])
 		SCHEME_STR_VAL(str)[i] = (char)SCHEME_CHAR_VAL(argv[i]);
 	}
 
-	return (str);
+	return str;
 }
 
 static Scheme_Object *
@@ -166,7 +166,7 @@ string_length(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "string-length: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-length: arg must be a string");
-	return (scheme_make_integer((int)strlen(SCHEME_STR_VAL(argv[0]))));
+	return scheme_make_integer((int)strlen(SCHEME_STR_VAL(argv[0])));
 }
 
 static Scheme_Object *
@@ -186,7 +186,7 @@ string_ref(int argc, Scheme_Object *argv[])
 		scheme_signal_error("string-ref: index out of range: %d", i);
 	}
 
-	return (scheme_make_char(str[i]));
+	return scheme_make_char(str[i]);
 }
 
 static Scheme_Object *
@@ -208,7 +208,7 @@ string_set(int argc, Scheme_Object *argv[])
 	}
 
 	str[i] = (char)SCHEME_CHAR_VAL(argv[2]);
-	return (argv[0]);
+	return argv[0];
 }
 
 /* comparisons */
@@ -258,7 +258,7 @@ substring(int argc, Scheme_Object *argv[])
 		SCHEME_STR_VAL(str)[i] = chars[i + start];
 	}
 
-	return (str);
+	return str;
 }
 
 static Scheme_Object *append_2(Scheme_Object *str1, Scheme_Object *str2);
@@ -274,7 +274,7 @@ string_append(int argc, Scheme_Object *argv[])
 		new = append_2(new, argv[i]);
 	}
 
-	return (new);
+	return new;
 }
 
 static Scheme_Object *
@@ -300,7 +300,7 @@ append_2(Scheme_Object *str1, Scheme_Object *str2)
 	}
 
 	SCHEME_STR_VAL(new)[len1 + len2] = '\0';
-	return (new);
+	return new;
 }
 
 
@@ -328,7 +328,7 @@ string_to_list(int argc, Scheme_Object *argv[])
 		}
 	}
 
-	return (first);
+	return first;
 }
 
 static Scheme_Object *
@@ -352,7 +352,7 @@ list_to_string(int argc, Scheme_Object *argv[])
 		list = SCHEME_CDR(list);
 	}
 
-	return (str);
+	return str;
 }
 
 static Scheme_Object *
@@ -362,7 +362,7 @@ string_copy(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 1), "string-copy: wrong number of args");
 	SCHEME_ASSERT(SCHEME_STRINGP(argv[0]), "string-copy: arg must be a string");
 	new = scheme_make_string(SCHEME_STR_VAL(argv[0]));
-	return (new);
+	return new;
 }
 
 static Scheme_Object *
@@ -382,7 +382,7 @@ string_fill(int argc, Scheme_Object *argv[])
 		chars[i] = (char)ch;
 	}
 
-	return (argv[0]);
+	return argv[0];
 }
 
 static int

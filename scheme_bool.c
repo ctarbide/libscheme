@@ -65,7 +65,7 @@ scheme_make_true(void)
 	Scheme_Object *true;
 	true = scheme_alloc_object();
 	SCHEME_TYPE(true) = scheme_true_type;
-	return (true);
+	return true;
 }
 
 static Scheme_Object *
@@ -74,7 +74,7 @@ scheme_make_false(void)
 	Scheme_Object *false;
 	false = scheme_alloc_object();
 	SCHEME_TYPE(false) = scheme_false_type;
-	return (false);
+	return false;
 }
 
 static Scheme_Object *
@@ -83,9 +83,9 @@ not_prim(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT(argc == 1, "not: wrong number of args");
 
 	if (argv[0] == scheme_false) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
@@ -95,9 +95,9 @@ boolean_p_prim(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 1), "boolean?: wrong number of args");
 
 	if ((argv[0] == scheme_false) || (argv[0] == scheme_true)) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
@@ -107,9 +107,9 @@ eq_prim(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 2), "eq?: wrong number of args");
 
 	if (argv[0] == argv[1]) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
@@ -119,9 +119,9 @@ eqv_prim(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 2), "eqv?: wrong number of args");
 
 	if (scheme_eqv(argv[0], argv[1])) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
@@ -131,16 +131,16 @@ equal_prim(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((argc == 2), "equal?: wrong number of args");
 
 	if (scheme_equal(argv[0], argv[1])) {
-		return (scheme_true);
+		return scheme_true;
 	} else {
-		return (scheme_false);
+		return scheme_false;
 	}
 }
 
 int
 scheme_eq(Scheme_Object *obj1, Scheme_Object *obj2)
 {
-	return (obj1 == obj2);
+	return obj1 == obj2;
 }
 
 int

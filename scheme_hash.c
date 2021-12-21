@@ -32,7 +32,7 @@ scheme_hash_table(size_t size)
 	table = (Scheme_Hash_Table *) scheme_malloc(sizeof(Scheme_Hash_Table));
 	table->size = size;
 	table->buckets = (Scheme_Bucket **) scheme_calloc((size_t)size, sizeof(Scheme_Bucket *));
-	return (table);
+	return table;
 }
 
 void
@@ -72,13 +72,13 @@ scheme_lookup_in_table(Scheme_Hash_Table *table, char *key)
 
 	while (bucket) {
 		if (strcmp(key, bucket->key) == 0) {
-			return (bucket->val);
+			return bucket->val;
 		} else {
 			bucket = bucket->next;
 		}
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 void
@@ -116,6 +116,6 @@ scheme_hash(char *key)
 		h += (h << 5) + h + (size_t) * key++;
 	}
 
-	return (unsigned int)(h & UINT_MAX);
+	return unsigned int)(h & UINT_MAX;
 }
 #endif

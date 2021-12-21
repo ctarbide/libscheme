@@ -56,7 +56,7 @@ scheme_basic_env(void)
 	scheme_init_promise(env);
 	scheme_init_struct(env);
 	scheme_env = env;
-	return (env);
+	return env;
 }
 
 static Scheme_Env *
@@ -66,7 +66,7 @@ scheme_make_env(void)
 	env = (Scheme_Env *) scheme_malloc(sizeof(Scheme_Env));
 	env->globals = scheme_hash_table(GLOBAL_TABLE_SIZE);
 	env->next = NULL;
-	return (env);
+	return env;
 }
 
 void
@@ -93,7 +93,7 @@ scheme_new_frame(int num_bindings)
 	frame->num_bindings = num_bindings;
 	frame->symbols = (Scheme_Object **) scheme_malloc((size_t)num_bindings * sizeof(Scheme_Object *));
 	frame->values = (Scheme_Object **) scheme_malloc((size_t)num_bindings * sizeof(Scheme_Object *));
-	return (frame);
+	return frame;
 }
 
 void
@@ -112,7 +112,7 @@ scheme_extend_env(Scheme_Env *frame, Scheme_Env *env)
 {
 	frame->globals = env->globals;
 	frame->next = env;
-	return (frame);
+	return frame;
 }
 
 Scheme_Env *
@@ -141,7 +141,7 @@ scheme_add_frame(Scheme_Object *syms, Scheme_Object *vals, Scheme_Env *env)
 	frame->globals = env->globals;
 	frame->next = env;
 	scheme_env = frame;
-	return (frame);
+	return frame;
 }
 
 Scheme_Env *
@@ -149,7 +149,7 @@ scheme_pop_frame(Scheme_Env *env)
 {
 	SCHEME_ASSERT((env->next), "trying to pop a frame from an empty environment");
 	scheme_env = env->next;
-	return (env->next);
+	return env->next;
 }
 
 void
@@ -189,18 +189,18 @@ scheme_lookup_value(Scheme_Object *symbol, Scheme_Env *env)
 
 		for (i = 0 ; i < frame->num_bindings ; ++i) {
 			if (symbol == frame->symbols[i]) {
-				return (frame->values[i]);
+				return frame->values[i];
 			}
 		}
 
 		frame = frame->next;
 	}
 
-	return (scheme_lookup_global(symbol, frame));
+	return scheme_lookup_global(symbol, frame);
 }
 
 Scheme_Object *
 scheme_lookup_global(Scheme_Object *symbol, Scheme_Env *env)
 {
-	return (scheme_lookup_in_table(env->globals, SCHEME_STR_VAL(symbol)));
+	return scheme_lookup_in_table(env->globals, SCHEME_STR_VAL(symbol));
 }

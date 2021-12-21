@@ -48,11 +48,11 @@ scheme_eval(Scheme_Object *obj, Scheme_Env *env)
 			scheme_signal_error("reference to unbound symbol: %s", SCHEME_STR_VAL(obj));
 		}
 
-		return (val);
+		return val;
 	} else if (type == scheme_pair_type) {
-		return (scheme_eval_combination(obj, env));
+		return scheme_eval_combination(obj, env);
 	} else {
-		return (obj);
+		return obj;
 	}
 }
 
@@ -69,12 +69,12 @@ scheme_eval_combination(Scheme_Object *comb, Scheme_Env *env)
 	type = SCHEME_TYPE(rator);
 
 	if (type == scheme_syntax_type) {
-		return (SCHEME_SYNTAX(rator)(comb, env));
+		return SCHEME_SYNTAX(rator)(comb, env);
 	} else if (type == scheme_macro_type) {
 		fun = (Scheme_Object *) SCHEME_PTR_VAL(rator);
 		rands = SCHEME_CDR(comb);
 		form = scheme_apply_to_list(fun, rands);
-		return (scheme_eval(form, env));
+		return scheme_eval(form, env);
 	} else {
 		rands = SCHEME_CDR(comb);
 		num_rands = scheme_list_length(rands);
@@ -86,7 +86,7 @@ scheme_eval_combination(Scheme_Object *comb, Scheme_Env *env)
 			rands = SCHEME_CDR(rands);
 		}
 
-		return (scheme_apply(rator, num_rands, evaled_rands));
+		return scheme_apply(rator, num_rands, evaled_rands);
 	}
 }
 
@@ -94,5 +94,5 @@ static Scheme_Object *
 eval(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "eval: wrong number of args");
-	return (scheme_eval(argv[0], scheme_env));
+	return scheme_eval(argv[0], scheme_env);
 }

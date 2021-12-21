@@ -71,7 +71,7 @@ scheme_make_vector(int size, Scheme_Object *fill)
 		SCHEME_VEC_ELS(vec)[i] = fill;
 	}
 
-	return (vec);
+	return vec;
 }
 
 /* locals */
@@ -80,7 +80,7 @@ static Scheme_Object *
 vector_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "vector?: wrong number of args");
-	return (SCHEME_VECTORP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_VECTORP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -99,7 +99,7 @@ make_vector(int argc, Scheme_Object *argv[])
 	}
 
 	vec = scheme_make_vector(len, fill);
-	return (vec);
+	return vec;
 }
 
 static Scheme_Object *
@@ -113,7 +113,7 @@ vector(int argc, Scheme_Object *argv[])
 		SCHEME_VEC_ELS(vec)[i] = argv[i];
 	}
 
-	return (vec);
+	return vec;
 }
 
 static Scheme_Object *
@@ -121,7 +121,7 @@ vector_length(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "vector-length: wrong number of args");
 	SCHEME_ASSERT(SCHEME_VECTORP(argv[0]), "vector-length: arg must be a vector");
-	return (scheme_make_integer(SCHEME_VEC_SIZE(argv[0])));
+	return scheme_make_integer(SCHEME_VEC_SIZE(argv[0]));
 }
 
 static Scheme_Object *
@@ -134,7 +134,7 @@ vector_ref(int argc, Scheme_Object *argv[])
 	i = SCHEME_INT_VAL(argv[1]);
 	SCHEME_ASSERT((i >= 0) && (i < SCHEME_VEC_SIZE(argv[0])),
 		"vector-ref: index out of range");
-	return (SCHEME_VEC_ELS(argv[0])[i]);
+	return SCHEME_VEC_ELS(argv[0])[i];
 }
 
 static Scheme_Object *
@@ -148,7 +148,7 @@ vector_set(int argc, Scheme_Object *argv[])
 	SCHEME_ASSERT((i >= 0) && (i < SCHEME_VEC_SIZE(argv[0])),
 		"vector-ref: index out of range");
 	SCHEME_VEC_ELS(argv[0])[i] = argv[2];
-	return (argv[0]);
+	return argv[0];
 }
 
 static Scheme_Object *
@@ -156,7 +156,7 @@ vector_to_list(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "vector->list: wrong number of args");
 	SCHEME_ASSERT(SCHEME_VECTORP(argv[0]), "vector->list: arg must be a vector");
-	return (scheme_vector_to_list(argv[0]));
+	return scheme_vector_to_list(argv[0]);
 }
 
 Scheme_Object *
@@ -178,7 +178,7 @@ scheme_vector_to_list(Scheme_Object *vec)
 		}
 	}
 
-	return (first);
+	return first;
 }
 
 static Scheme_Object *
@@ -186,7 +186,7 @@ list_to_vector(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "list->vector: wrong number of args");
 	SCHEME_ASSERT(SCHEME_LISTP(argv[0]), "list->vector: arg must be a list");
-	return (scheme_list_to_vector(argv[0]));
+	return scheme_list_to_vector(argv[0]);
 }
 
 Scheme_Object *
@@ -204,7 +204,7 @@ scheme_list_to_vector(Scheme_Object *list)
 		list = SCHEME_CDR(list);
 	}
 
-	return (vec);
+	return vec;
 }
 
 static Scheme_Object *
@@ -218,7 +218,7 @@ vector_fill(int argc, Scheme_Object *argv[])
 		SCHEME_VEC_ELS(argv[0])[i] = argv[1];
 	}
 
-	return (argv[0]);
+	return argv[0];
 }
 
 static Scheme_Object *
@@ -241,5 +241,5 @@ vector_append(int argc, Scheme_Object *argv[])
 		SCHEME_VEC_ELS(new)[i] = SCHEME_VEC_ELS(argv[1])[i - len1];
 	}
 
-	return (new);
+	return new;
 }

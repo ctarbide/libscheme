@@ -37,7 +37,7 @@ scheme_alloc_object(void)
 {
 	Scheme_Object *object;
 	object = (Scheme_Object *) scheme_malloc(sizeof(Scheme_Object));
-	return (object);
+	return object;
 }
 
 void *
@@ -46,7 +46,7 @@ scheme_malloc(size_t size)
 	void *space;
 	space = MALLOC(size);
 	SCHEME_ASSERT((space != 0), "memory allocation failure");
-	return (space);
+	return space;
 }
 
 void *
@@ -58,7 +58,7 @@ scheme_calloc(size_t num, size_t size)
 #ifdef NO_GC
 	memset(space, 0, (num * size));
 #endif
-	return (space);
+	return space;
 }
 
 char *
@@ -67,5 +67,5 @@ scheme_strdup(char *str)
 	char *new;
 	new = scheme_malloc((strlen(str) + 1) * sizeof(char));
 	strcpy(new, str);
-	return (new);
+	return new;
 }

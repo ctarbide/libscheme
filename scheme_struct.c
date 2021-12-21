@@ -76,28 +76,28 @@ scheme_apply_struct_proc(Scheme_Object *sp, Scheme_Object *args)
 		}
 
 		SCHEME_ASSERT((i == proc->slot_num), "wrong number of args to struct constructor");
-		return (inst);
+		return inst;
 	}
 
 	case SCHEME_PRED:
 		if (SCHEME_TYPE(SCHEME_CAR(args)) == proc->struct_type) {
-			return (scheme_true);
+			return scheme_true;
 		} else {
-			return (scheme_false);
+			return scheme_false;
 		}
 
 	case SCHEME_GETTER: {
 		Scheme_Object *inst;
 		inst = SCHEME_CAR(args);
 		SCHEME_ASSERT((SCHEME_TYPE(inst) == proc->struct_type), "wrong type to getter function");
-		return (SCHEME_VEC_ELS(inst)[proc->slot_num]);
+		return SCHEME_VEC_ELS(inst)[proc->slot_num];
 	}
 
 	case SCHEME_SETTER: {
 		Scheme_Object *inst;
 		inst = SCHEME_CAR(args);
 		SCHEME_ASSERT((SCHEME_TYPE(inst) == proc->struct_type), "wrong type to getter function");
-		return (SCHEME_VEC_ELS(inst)[proc->slot_num] = SCHEME_CAR(SCHEME_CDR(args)));
+		return SCHEME_VEC_ELS(inst)[proc->slot_num] = SCHEME_CAR(SCHEME_CDR(args));
 	}
 	}
 
@@ -133,7 +133,7 @@ define_struct_syntax(Scheme_Object *form, Scheme_Env *env)
 		slot_num++;
 	}
 
-	return (struct_symbol);
+	return struct_symbol;
 }
 
 static Scheme_Object *
@@ -144,7 +144,7 @@ scheme_make_instance(Scheme_Object *type, int num_fields)
 	SCHEME_TYPE(inst) = type;
 	SCHEME_VEC_SIZE(inst) = num_fields;
 	SCHEME_VEC_ELS(inst) = (Scheme_Object **) scheme_malloc(sizeof(Scheme_Object *));
-	return (inst);
+	return inst;
 }
 
 static Scheme_Object *
@@ -159,31 +159,31 @@ scheme_make_struct_proc(Scheme_Object *type, int proc_type, int field_num)
 	obj = scheme_alloc_object();
 	SCHEME_TYPE(obj) = scheme_struct_proc_type;
 	SCHEME_PTR_VAL(obj) = proc;
-	return (obj);
+	return obj;
 }
 
 static Scheme_Object *
 scheme_make_constructor(Scheme_Object *type, int num_fields)
 {
-	return (scheme_make_struct_proc(type, SCHEME_CONSTR, num_fields));
+	return scheme_make_struct_proc(type, SCHEME_CONSTR, num_fields);
 }
 
 static Scheme_Object *
 scheme_make_pred(Scheme_Object *type)
 {
-	return (scheme_make_struct_proc(type, SCHEME_PRED, 0));
+	return scheme_make_struct_proc(type, SCHEME_PRED, 0);
 }
 
 static Scheme_Object *
 scheme_make_getter(Scheme_Object *type, int field)
 {
-	return (scheme_make_struct_proc(type, SCHEME_GETTER, field));
+	return scheme_make_struct_proc(type, SCHEME_GETTER, field);
 }
 
 static Scheme_Object *
 scheme_make_setter(Scheme_Object *type, int field)
 {
-	return (scheme_make_struct_proc(type, SCHEME_SETTER, field));
+	return scheme_make_struct_proc(type, SCHEME_SETTER, field);
 }
 
 static char *
@@ -199,7 +199,7 @@ type_name(char *struct_name)
 	strcat(name, struct_name);
 	name[orig_len + 1] = '>';
 	name[orig_len + 2] = '\0';
-	return (name);
+	return name;
 }
 
 static char *
@@ -212,7 +212,7 @@ constructor_name(char *struct_name)
 	name = (char *) scheme_malloc(sizeof(char) * (orig_len + make_len + 1));
 	strcpy(name, "make-");
 	strcat(name, struct_name);
-	return (name);
+	return name;
 }
 
 static char *
@@ -225,7 +225,7 @@ pred_name(char *struct_name)
 	strcpy(name, struct_name);
 	name[orig_len] = '?';
 	name[orig_len + 1] = '\0';
-	return (name);
+	return name;
 }
 
 static char *
@@ -240,7 +240,7 @@ getter_name(char *struct_name, char *field_name)
 	strcpy(name, struct_name);
 	strcat(name, "-");
 	strcat(name, field_name);
-	return (name);
+	return name;
 }
 
 static char *
@@ -260,6 +260,6 @@ setter_name(char *struct_name, char *field_name)
 	strcat(name, "-");
 	strcat(name, field_name);
 	strcat(name, "!");
-	return (name);
+	return name;
 }
 

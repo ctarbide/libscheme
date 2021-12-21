@@ -95,7 +95,7 @@ scheme_make_syntax(Scheme_Syntax *proc)
 	syntax = scheme_alloc_object();
 	SCHEME_TYPE(syntax) = scheme_syntax_type;
 	SCHEME_SYNTAX(syntax) = proc;
-	return (syntax);
+	return syntax;
 }
 
 /* builtin syntax */
@@ -105,7 +105,7 @@ lambda_syntax(Scheme_Object *form, Scheme_Env *env)
 {
 	SCHEME_ASSERT(SCHEME_PAIRP(form), "badly formed lambda");
 	SCHEME_ASSERT(SCHEME_PAIRP(SCHEME_CDR(form)), "badly formed lambda");
-	return (scheme_make_closure(env, SCHEME_CDR(form)));
+	return scheme_make_closure(env, SCHEME_CDR(form));
 }
 
 static Scheme_Object *
@@ -128,14 +128,14 @@ define_syntax(Scheme_Object *form, Scheme_Env *env)
 	}
 
 	scheme_add_global(SCHEME_STR_VAL(var), val, env);
-	return (var);
+	return var;
 }
 
 static Scheme_Object *
 quote_syntax(Scheme_Object *form, Scheme_Env *env)
 {
 	SCHEME_ASSERT((scheme_list_length(form) == 2), "quote: wrong number of args");
-	return (SCHEME_CAR(SCHEME_CDR(form)));
+	return SCHEME_CAR(SCHEME_CDR(form));
 }
 
 static Scheme_Object *
@@ -150,13 +150,13 @@ if_syntax(Scheme_Object *form, Scheme_Env *env)
 
 	if (test != scheme_false) {
 		thenp = SCHEME_CAR(SCHEME_CDR(SCHEME_CDR(form)));
-		return (scheme_eval(thenp, env));
+		return scheme_eval(thenp, env);
 	} else {
 		if (len == 4) {
 			elsep = SCHEME_CAR(SCHEME_CDR(SCHEME_CDR((SCHEME_CDR(form)))));
-			return (scheme_eval(elsep, env));
+			return scheme_eval(elsep, env);
 		} else {
-			return (scheme_false);
+			return scheme_false;
 		}
 	}
 }
@@ -171,7 +171,7 @@ set_syntax(Scheme_Object *form, Scheme_Env *env)
 		"second arg to `set!' must be symbol");
 	val = scheme_eval(SCHEME_CAR(SCHEME_CDR(SCHEME_CDR(form))), env);
 	scheme_set_value(var, val, env);
-	return (val);
+	return val;
 }
 
 static Scheme_Object *
@@ -209,13 +209,13 @@ cond_syntax(Scheme_Object *form, Scheme_Env *env)
 				}
 			}
 
-			return (ret);
+			return ret;
 		}
 
 		clauses = SCHEME_CDR(clauses);
 	}
 
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -239,7 +239,7 @@ case_syntax(Scheme_Object *form, Scheme_Env *env)
 				exprs = SCHEME_CDR(exprs);
 			}
 
-			return (res);
+			return res;
 		}
 
 		SCHEME_ASSERT(SCHEME_PAIRP(data), "case: first thing in clause must be a list");
@@ -253,7 +253,7 @@ case_syntax(Scheme_Object *form, Scheme_Env *env)
 					exprs = SCHEME_CDR(exprs);
 				}
 
-				return (res);
+				return res;
 			}
 
 			data = SCHEME_CDR(data);
@@ -262,7 +262,7 @@ case_syntax(Scheme_Object *form, Scheme_Env *env)
 		clauses = SCHEME_CDR(clauses);
 	}
 
-	return (scheme_false);
+	return scheme_false;
 }
 
 static Scheme_Object *
@@ -276,13 +276,13 @@ and_syntax(Scheme_Object *form, Scheme_Env *env)
 		ret = scheme_eval(SCHEME_CAR(forms), env);
 
 		if (ret == scheme_false) {
-			return (scheme_false);
+			return scheme_false;
 		}
 
 		forms = SCHEME_CDR(forms);
 	}
 
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -296,13 +296,13 @@ or_syntax(Scheme_Object *form, Scheme_Env *env)
 		ret = scheme_eval(SCHEME_CAR(forms), env);
 
 		if (ret != scheme_false) {
-			return (ret);
+			return ret;
 		}
 
 		forms = SCHEME_CDR(forms);
 	}
 
-	return (ret);
+	return ret;
 }
 
 static int internal_def_p(Scheme_Object *form);
@@ -317,7 +317,7 @@ let_syntax(Scheme_Object *form, Scheme_Env *env)
 	Scheme_Env *frame;
 
 	if (SCHEME_SYMBOLP(SCHEME_CAR(SCHEME_CDR(form)))) {
-		return (named_let_syntax(form, env));
+		return named_let_syntax(form, env);
 	}
 
 	SCHEME_ASSERT((scheme_list_length(form) >= 3), "badly formed `let' form");
@@ -398,13 +398,13 @@ let_syntax(Scheme_Object *form, Scheme_Env *env)
 
 	/* pop regular binding frame */
 	env = scheme_pop_frame(env);
-	return (ret);
+	return ret;
 }
 
 static int
 internal_def_p(Scheme_Object *form)
 {
-	return (SCHEME_PAIRP(form) && (SCHEME_CAR(form) == scheme_define));
+	return SCHEME_PAIRP(form) && (SCHEME_CAR(form) == scheme_define);
 }
 
 static Scheme_Object *
@@ -424,7 +424,7 @@ named_let_syntax(Scheme_Object *form, Scheme_Env *env)
 	scheme_set_value(name, proc, env);
 	ret = scheme_eval(init, env);
 	env = scheme_pop_frame(env);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -523,7 +523,7 @@ let_star_syntax(Scheme_Object *form, Scheme_Env *env)
 
 	/* pop regular binding frame */
 	env = scheme_pop_frame(env);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -611,7 +611,7 @@ letrec_syntax(Scheme_Object *form, Scheme_Env *env)
 
 	/* pop regular binding frame */
 	env = scheme_pop_frame(env);
-	return (res);
+	return res;
 }
 
 static Scheme_Object *
@@ -626,7 +626,7 @@ begin_syntax(Scheme_Object *form, Scheme_Env *env)
 		forms = SCHEME_CDR(forms);
 	}
 
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -722,14 +722,14 @@ do_syntax(Scheme_Object *form, Scheme_Env *env)
 
 	/* pop the frame we've added */
 	env = scheme_pop_frame(env);
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
 delay_syntax(Scheme_Object *form, Scheme_Env *env)
 {
 	SCHEME_ASSERT((scheme_list_length(form) == 2), "delay: bad form");
-	return (scheme_make_promise(SCHEME_CAR(SCHEME_CDR(form)), env));
+	return scheme_make_promise(SCHEME_CAR(SCHEME_CDR(form)), env);
 }
 
 static Scheme_Object *quasi(Scheme_Object *x, int level, Scheme_Env *env);
@@ -738,7 +738,7 @@ static Scheme_Object *
 quasiquote_syntax(Scheme_Object *form, Scheme_Env *env)
 {
 	SCHEME_ASSERT((scheme_list_length(form) == 2), "quasiquote(`): wrong number of args");
-	return (quasi(SCHEME_CAR(SCHEME_CDR(form)), 0, env));
+	return quasi(SCHEME_CAR(SCHEME_CDR(form)), 0, env);
 }
 
 static Scheme_Object *
@@ -749,7 +749,7 @@ quasi(Scheme_Object *x, int level, Scheme_Env *env)
 	if (SCHEME_VECTORP(x)) {
 		x = scheme_vector_to_list(x);
 		x = quasi(x, level, env);
-		return (scheme_list_to_vector(x));
+		return scheme_list_to_vector(x);
 	}
 
 	if (! SCHEME_PAIRP(x)) {
@@ -831,5 +831,5 @@ defmacro_syntax(Scheme_Object *form, Scheme_Env *env)
 	SCHEME_TYPE(macro) = scheme_macro_type;
 	SCHEME_PTR_VAL(macro) = fun;
 	scheme_add_global(SCHEME_STR_VAL(name), macro, env);
-	return (macro);
+	return macro;
 }

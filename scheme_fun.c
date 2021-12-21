@@ -64,7 +64,7 @@ scheme_make_prim(Scheme_Prim *fun)
 	prim = scheme_alloc_object();
 	SCHEME_TYPE(prim) = scheme_prim_type;
 	SCHEME_PRIM(prim) = fun;
-	return (prim);
+	return prim;
 }
 
 Scheme_Object *
@@ -75,7 +75,7 @@ scheme_make_closure(Scheme_Env *env, Scheme_Object *code)
 	SCHEME_TYPE(closure) = scheme_closure_type;
 	SCHEME_CLOS_ENV(closure) = env;
 	SCHEME_CLOS_CODE(closure) = code;
-	return (closure);
+	return closure;
 }
 
 Scheme_Object *
@@ -89,7 +89,7 @@ scheme_make_cont(void)
 	cont->escaped = 0;
 	cont->retval = scheme_null;
 	SCHEME_CONT_VAL(obj) = cont;
-	return (obj);
+	return obj;
 }
 
 Scheme_Object *
@@ -206,9 +206,9 @@ scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands)
 
 		/* pop regular binding frame */
 		env = scheme_pop_frame(env);
-		return (ret);
+		return ret;
 	} else if (fun_type == scheme_prim_type) {
-		return (SCHEME_PRIM(rator)(num_rands, rands));
+		return SCHEME_PRIM(rator)(num_rands, rands);
 	} else if (fun_type == scheme_cont_type) {
 		Scheme_Cont *cont = SCHEME_CONT_VAL(rator);
 		SCHEME_ASSERT((num_rands == 1),
@@ -241,7 +241,7 @@ scheme_apply_to_list(Scheme_Object *rator, Scheme_Object *rands)
 		rands = SCHEME_CDR(rands);
 	}
 
-	return (scheme_apply(rator, num_rands, rands_vec));
+	return scheme_apply(rator, num_rands, rands_vec);
 }
 
 /* locals */
@@ -264,14 +264,14 @@ scheme_collect_rest(int num_rest, Scheme_Object **rest)
 		}
 	}
 
-	return (rest_list);
+	return rest_list;
 }
 
 static Scheme_Object *
 procedure_p(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT((argc == 1), "procedure?: wrong number of args");
-	return (SCHEME_PROCP(argv[0]) ? scheme_true : scheme_false);
+	return SCHEME_PROCP(argv[0]) ? scheme_true : scheme_false;
 }
 
 static Scheme_Object *
@@ -310,7 +310,7 @@ apply(int argc, Scheme_Object *argv[])
 		rands = SCHEME_CDR(rands);
 	}
 
-	return (scheme_apply(argv[0], num_rands, rand_vec));
+	return scheme_apply(argv[0], num_rands, rand_vec);
 }
 
 static Scheme_Object *
@@ -363,7 +363,7 @@ map(int argc, Scheme_Object *argv[])
 		}
 	}
 
-	return (retfirst);
+	return retfirst;
 }
 
 #if 0
@@ -371,7 +371,7 @@ static Scheme_Object *
 map_help(Scheme_Object *fun, Scheme_Object *list)
 {
 	if (SCHEME_NULLP(list)) {
-		return (scheme_null);
+		return scheme_null;
 	} else {
 		return (scheme_make_pair
 				(scheme_apply_to_list(fun, scheme_make_pair(SCHEME_CAR(list), scheme_null)),
@@ -395,7 +395,7 @@ for_each(int argc, Scheme_Object *argv[])
 		list = SCHEME_CDR(list);
 	}
 
-	return (ret);
+	return ret;
 }
 
 static Scheme_Object *
@@ -413,9 +413,9 @@ call_cc(int argc, Scheme_Object *argv[])
 		ret = cont->retval;
 		cont->retval = scheme_null;
 	} else {
-		return (scheme_apply_to_list(argv[0], scheme_make_pair(obj, scheme_null)));
+		return scheme_apply_to_list(argv[0], scheme_make_pair(obj, scheme_null));
 	}
 
 	cont->escaped = 1;
-	return (ret);
+	return ret;
 }
