@@ -6,20 +6,27 @@
 # This must be an ANSI C compiler.
 #
 CC = gcc
+CPROTO = cproto
 
 #
 # Optimization and debugging flags go here.
 #
 #CFLAGS = -O
 #CFLAGS = -ggdb3 -O0 -I${HOME}/local/include
-CFLAGS = -ggdb3 -O0 -DNO_GC
+#CFLAGS = -ggdb3 -O0 -DNO_GC
 #CFLAGS = -ggdb3 -O0 -DNO_GC -m32
+
+CFLAGS = -ggdb3 -O0 -DNO_GC \
+    -std=c99 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
+    -Wconversion -Wdeclaration-after-statement
 
 #
 # The math library is needed for the numeric functions
 # in scheme_number.c.
 #LIBS = -L.. -L${HOME}/local/lib64 -L${HOME}/local/lib -lm -lgc
 LIBS = -lm
+
+CPROTOFLAGS = -I${HOME}/local/include
 
 #
 # If your system needs ranlib, put it here.  Otherwise,
@@ -68,6 +75,13 @@ SRCS =  scheme_alloc.c \
 	scheme_syntax.c \
 	scheme_type.c \
 	scheme_vector.c
+
+all: test
+
+scheme_prototypes.h: $(SRCS)
+	$(CPROTO) $(CPROTOFLAGS) $(SRCS) > .tmp.scheme_prototypes.h
+	mv -f .tmp.scheme_prototypes.h scheme_prototypes.h
+	chmod a-w scheme_prototypes.h
 
 libscheme.a: $(OBJS)
 	$(AR) rv libscheme.a $(OBJS)

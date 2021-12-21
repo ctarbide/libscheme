@@ -25,11 +25,21 @@
 #ifndef SCHEME_H
 #define SCHEME_H
 
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#endif
+
+#ifndef _POSIX_C_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
+
 #include <stdio.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <sys/select.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -134,9 +144,6 @@ typedef struct Scheme_Object *
 
 /* error handling */
 extern jmp_buf scheme_error_buf;
-void scheme_signal_error(char *msg, ...);
-void scheme_warning(char *msg, ...);
-void scheme_default_handler(void);
 #define SCHEME_CATCH_ERROR(try_expr, err_expr) \
   (setjmp(scheme_error_buf) ? (err_expr) : (try_expr))
 #define SCHEME_ASSERT(expr,msg) \
@@ -169,44 +176,6 @@ extern Scheme_Object *scheme_null;
 extern Scheme_Object *scheme_true;
 extern Scheme_Object *scheme_false;
 
-/* basics */
-Scheme_Object *scheme_read(Scheme_Object *port);
-Scheme_Object *scheme_eval(Scheme_Object *obj, Scheme_Env *env);
-void scheme_write(Scheme_Object *obj, Scheme_Object *port);
-void scheme_display(Scheme_Object *obj, Scheme_Object *port);
-void scheme_write_string(char *str, Scheme_Object *port);
-char *scheme_write_to_string(Scheme_Object *obj);
-char *scheme_display_to_string(Scheme_Object *obj);
-void scheme_debug_print(Scheme_Object *obj);
-Scheme_Object *scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands);
-Scheme_Object *scheme_apply_to_list(Scheme_Object *rator, Scheme_Object *rands);
-Scheme_Object *scheme_apply_struct_proc(Scheme_Object *rator, Scheme_Object *rands);
-Scheme_Object *scheme_alloc_object(void);
-void *scheme_malloc(size_t size);
-void *scheme_calloc(size_t num, size_t size);
-char *scheme_strdup(char *str);
-
-/* hash table interface */
-Scheme_Hash_Table *scheme_hash_table(int size);
-void scheme_add_to_table(Scheme_Hash_Table *table, char *key, void *val);
-void scheme_change_in_table(Scheme_Hash_Table *table, char *key, void *new_val);
-void *scheme_lookup_in_table(Scheme_Hash_Table *table, char *key);
-
-/* constructors */
-Scheme_Object *scheme_make_prim(Scheme_Prim *prim);
-Scheme_Object *scheme_make_closure(Scheme_Env *env, Scheme_Object *code);
-Scheme_Object *scheme_make_cont(void);
-Scheme_Object *scheme_make_type(char *name);
-Scheme_Object *scheme_make_pair(Scheme_Object *car, Scheme_Object *cdr);
-Scheme_Object *scheme_make_string(char *chars);
-Scheme_Object *scheme_alloc_string(int size, char fill);
-Scheme_Object *scheme_make_vector(int size, Scheme_Object *fill);
-Scheme_Object *scheme_make_integer(int i);
-Scheme_Object *scheme_make_double(double d);
-Scheme_Object *scheme_make_char(char ch);
-Scheme_Object *scheme_make_syntax(Scheme_Syntax *syntax);
-Scheme_Object *scheme_make_promise(Scheme_Object *expr, Scheme_Env *env);
-
 /* generic port support */
 
 struct Scheme_Input_Port {
@@ -227,77 +196,12 @@ struct Scheme_Output_Port {
 };
 typedef struct Scheme_Output_Port Scheme_Output_Port;
 
-int scheme_getc(Scheme_Object *port);
-void scheme_ungetc(int ch, Scheme_Object *port);
-int scheme_char_ready(Scheme_Object *port);
-void scheme_close_input_port(Scheme_Object *port);
-void scheme_close_output_port(Scheme_Object *port);
-
-Scheme_Input_Port *
-scheme_make_input_port(
-	Scheme_Object *subtype,
-	void *data,
-	int (*getc_fun)(Scheme_Input_Port*),
-	void (*ungetc_fun)(int, Scheme_Input_Port*),
-	int (*char_ready_fun)(Scheme_Input_Port*),
-	void (*close_fun)(Scheme_Input_Port*)
-);
-Scheme_Output_Port *
-scheme_make_output_port(
-	Scheme_Object *subtype,
-	void *data,
-	void (*write_string_fun)(char *str, Scheme_Output_Port*),
-	void (*close_fun)(Scheme_Output_Port*)
-);
-Scheme_Object *scheme_make_file_input_port(FILE *fp);
-Scheme_Object *scheme_make_string_input_port(char *str);
-Scheme_Object *scheme_make_file_output_port(FILE *fp);
-Scheme_Object *scheme_make_string_output_port(char *str);
 extern Scheme_Object *scheme_stdin_port;
 extern Scheme_Object *scheme_stdout_port;
 extern Scheme_Object *scheme_stderr_port;
 
 /* environment */
-void scheme_add_global(char *name, Scheme_Object *val, Scheme_Env *env);
-Scheme_Env *scheme_new_frame(int num_bindings);
-void scheme_add_binding(int index, Scheme_Object *sym, Scheme_Object *val, Scheme_Env *frame);
-Scheme_Env *scheme_extend_env(Scheme_Env *frame, Scheme_Env *env);
-Scheme_Env *scheme_add_frame(Scheme_Object *syms, Scheme_Object *vals, Scheme_Env *env);
-Scheme_Env *scheme_pop_frame(Scheme_Env *env);
-void scheme_set_value(Scheme_Object *var, Scheme_Object *val, Scheme_Env *env);
-Scheme_Object *scheme_lookup_value(Scheme_Object *symbol, Scheme_Env *env);
-Scheme_Object *scheme_lookup_global(Scheme_Object *symbol, Scheme_Env *env);
 extern Scheme_Env *scheme_env;
-
-/* symbols */
-Scheme_Object *scheme_intern_symbol(char *name);
-
-/* initialization */
-Scheme_Env *scheme_basic_env(void);
-void scheme_init_type(Scheme_Env *env);
-void scheme_init_list(Scheme_Env *env);
-void scheme_init_port(Scheme_Env *env);
-void scheme_init_proc(Scheme_Env *env);
-void scheme_init_vector(Scheme_Env *env);
-void scheme_init_string(Scheme_Env *env);
-void scheme_init_number(Scheme_Env *env);
-void scheme_init_eval(Scheme_Env *env);
-void scheme_init_promise(Scheme_Env *env);
-void scheme_init_struct(Scheme_Env *env);
-
-/* misc */
-int scheme_eq(Scheme_Object *obj1, Scheme_Object *obj2);
-int scheme_eqv(Scheme_Object *obj1, Scheme_Object *obj2);
-int scheme_equal(Scheme_Object *obj1, Scheme_Object *obj2);
-int scheme_list_length(Scheme_Object *list);
-Scheme_Object *scheme_alloc_list(int size);
-Scheme_Object *scheme_map_1(Scheme_Object * (*fun)(Scheme_Object*), Scheme_Object *lst);
-Scheme_Object *scheme_car(Scheme_Object *pair);
-Scheme_Object *scheme_cdr(Scheme_Object *pair);
-Scheme_Object *scheme_cadr(Scheme_Object *pair);
-Scheme_Object *scheme_caddr(Scheme_Object *pair);
-Scheme_Object *scheme_vector_to_list(Scheme_Object *vec);
-Scheme_Object *scheme_list_to_vector(Scheme_Object *list);
 
 /* convenience macros */
 #define SCHEME_CHARP(obj)    (SCHEME_TYPE(obj) == scheme_char_type)
@@ -327,6 +231,8 @@ Scheme_Object *scheme_list_to_vector(Scheme_Object *list);
 
 /* constants */
 #define SCHEME_MAX_ARGS 256	/* max number of args to function */
+
+#include "scheme_prototypes.h"
 
 #ifdef __cplusplus
 }
