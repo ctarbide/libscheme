@@ -249,7 +249,7 @@ integer_to_char(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "integer->char: wrong number of args");
 	SCHEME_ASSERT(SCHEME_INTP(argv[0]), "integer->char: arg must be an integer");
-	return scheme_make_char((char)SCHEME_INT_VAL(argv[0]));
+	return scheme_make_char(SCHEME_INT_VAL(argv[0]));
 }
 
 static Scheme_Object *
@@ -257,7 +257,7 @@ char_upcase(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-upcase: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-upcase: arg must be a character");
-	return scheme_make_char((char)toupper(SCHEME_CHAR_VAL(argv[0])));
+	return scheme_make_char(toupper(SCHEME_CHAR_VAL(argv[0])));
 }
 
 static Scheme_Object *
@@ -265,5 +265,5 @@ char_downcase(int argc, Scheme_Object *argv[])
 {
 	SCHEME_ASSERT(argc == 1, "char-downcase: wrong number of args");
 	SCHEME_ASSERT(SCHEME_CHARP(argv[0]), "char-downcase: arg must be a character");
-	return scheme_make_char((char)tolower(SCHEME_CHAR_VAL(argv[0])));
+	return scheme_make_char(tolower(SCHEME_CHAR_VAL(argv[0])));
 }

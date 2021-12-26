@@ -619,7 +619,7 @@ read_char(int argc, Scheme_Object *argv[])
 	if (ch == EOF) {
 		return scheme_eof;
 	} else {
-		return scheme_make_char((char)ch);
+		return scheme_make_char(ch);
 	}
 }
 
@@ -643,7 +643,7 @@ peek_char(int argc, Scheme_Object *argv[])
 		return scheme_eof;
 	} else {
 		scheme_ungetc(ch, port);
-		return scheme_make_char((char)ch);
+		return scheme_make_char(ch);
 	}
 }
 
@@ -748,7 +748,7 @@ write_char(int argc, Scheme_Object *argv[])
 static Scheme_Object *
 load(int argc, Scheme_Object *argv[])
 {
-	Scheme_Object *obj, *ret, *port;
+	Scheme_Object *obj, *ret = scheme_null, *port;
 	char *filename;
 	FILE *fp;
 	SCHEME_ASSERT((argc == 1), "load: wrong number of args");

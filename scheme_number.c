@@ -806,7 +806,7 @@ string_to_number(int argc, Scheme_Object *argv[])
 
 	is_float = 0;
 
-	for (i = 0 ; i < len ; ++i) {
+	for (i = 0 ; (size_t)i < len ; ++i) {
 		int ch = str[i];
 
 		if ((ch == '.') || (ch == 'e') || (ch == 'E')) {
@@ -817,7 +817,8 @@ string_to_number(int argc, Scheme_Object *argv[])
 	if (is_float) {
 		d = strtod(str, &ptr);
 
-		if ((ptr - str) < len) {
+		/* ptr >= str, n.b. strtod */
+		if ((size_t)(ptr - str) < len) {
 			return scheme_false;
 		} else {
 			return scheme_make_double(d);
@@ -825,7 +826,8 @@ string_to_number(int argc, Scheme_Object *argv[])
 	} else {
 		val = strtol(SCHEME_STR_VAL(argv[0]), &ptr, base);
 
-		if ((ptr - str) < len) {
+		/* ptr >= str, n.b. strtol */
+		if ((size_t)(ptr - str) < len) {
 			return scheme_false;
 		} else {
 			if (val > INT_MAX) {

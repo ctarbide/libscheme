@@ -100,7 +100,7 @@ scheme_apply(Scheme_Object *rator, int num_rands, Scheme_Object **rands)
 
 	if (fun_type == scheme_closure_type) {
 		Scheme_Env *env, *frame;
-		Scheme_Object *params, *forms, *ret;
+		Scheme_Object *params, *forms, *ret = scheme_null;
 		Scheme_Object *vars, *vals, *vars_last, *vals_last, *pair, *aform;
 		int num_int_defs, num_params, i, has_rest;
 		env = SCHEME_CLOS_ENV(rator);
@@ -383,7 +383,7 @@ map_help(Scheme_Object *fun, Scheme_Object *list)
 static Scheme_Object *
 for_each(int argc, Scheme_Object *argv[])
 {
-	Scheme_Object *ret, *list, *fun;
+	Scheme_Object *ret = scheme_null, *list, *fun;
 	SCHEME_ASSERT((argc == 2), "for-each: two argument version only");
 	SCHEME_ASSERT(SCHEME_PROCP(argv[0]), "for-each: first arg must be a procedure");
 	SCHEME_ASSERT(SCHEME_LISTP(argv[1]), "for-each: second arg must be a list");

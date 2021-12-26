@@ -18,24 +18,28 @@ CPROTO = cproto
 
 # -fmax-errors=N: GCC 4.6 and later
 
-CFLAGS = -ggdb3 -O0 -DNO_GC \
-    -std=c99 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wshadow \
-    -Wconversion -Wdeclaration-after-statement \
-    -Werror -fmax-errors=5
+# https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
+# WARNING: some warnings only show up when using optimizations (!)
+OFLAG = -O2
+# OFLAG = -O0
 
-#
+# WERROR = -Werror -fmax-errors=5
+WERROR =
+
+CFLAGS = -ggdb3 $(OFLAG) -std=c99 \
+    -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
+    -Wshadow -Wconversion -Wdeclaration-after-statement \
+    -Wno-unused-parameter \
+    $(WERROR) \
+    -I${HOME}/local/include \
+    -DNO_GC
+
 # The math library is needed for the numeric functions
 # in scheme_number.c.
-#LIBS = -L.. -L${HOME}/local/lib64 -L${HOME}/local/lib -lm -lgc
-LIBS = -lm
+LIBS = -L${HOME}/local/lib64 -L${HOME}/local/lib -lm -lgc
+#LIBS = -lm
 
 CPROTOFLAGS = -I${HOME}/local/include
-
-#
-# If your system needs ranlib, put it here.  Otherwise,
-# use a colon.
-#
-RANLIB=:
 
 OBJS =  scheme_alloc.o \
 	scheme_bool.o \
@@ -88,11 +92,19 @@ scheme_prototypes.h: $(SRCS)
 
 libscheme.a: $(OBJS)
 	$(AR) rv libscheme.a $(OBJS)
-	$(RANLIB) libscheme.a
 
 test: libscheme.a main.o 
 	$(CC) $(CFLAGS) -o test main.o libscheme.a $(LIBS)
 
+.SUFFIXES: .o
+.c.o:
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+.PHONY: sparse
+sparse:
+	sparse -Wsparse-all $(CFLAGS) -Wno-transparent-union $(SRCS)
+
 clean:
-	/bin/rm -f $(OBJS) main.o libscheme.a test *~ \
-	libscheme.aux libscheme.dvi libscheme.log tmp1 tmp2 tmp3
+	rm -f $(OBJS) main.o libscheme.a test *~ \
+	    libscheme.aux libscheme.dvi libscheme.log \
+	    tmp1 tmp2 tmp3

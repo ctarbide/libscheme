@@ -102,7 +102,7 @@ scheme_alloc_string(size_t size, int fill)
 	SCHEME_TYPE(str) = scheme_string_type;
 	SCHEME_STR_VAL(str) = (char *) scheme_malloc(sizeof(char) * (size_t)(size + 1));
 
-	for (i = 0 ; i < size ; ++i) {
+	for (i = 0 ; (size_t)i < size ; ++i) {
 		SCHEME_STR_VAL(str)[i] = (char)fill;
 	}
 
@@ -182,7 +182,7 @@ string_ref(int argc, Scheme_Object *argv[])
 	len = strlen(str);
 	i = SCHEME_INT_VAL(argv[1]);
 
-	if ((i < 0) || (i >= len)) {
+	if ((i < 0) || ((size_t)i >= len)) {
 		scheme_signal_error("string-ref: index out of range: %d", i);
 	}
 
@@ -203,7 +203,7 @@ string_set(int argc, Scheme_Object *argv[])
 	len = strlen(str);
 	i = SCHEME_INT_VAL(argv[1]);
 
-	if ((i < 0) || (i >= len)) {
+	if ((i < 0) || ((size_t)i >= len)) {
 		scheme_signal_error("string-set!: index out of range: %d", i);
 	}
 
@@ -250,8 +250,9 @@ substring(int argc, Scheme_Object *argv[])
 	len = strlen(chars);
 	start = SCHEME_INT_VAL(argv[1]);
 	finish = SCHEME_INT_VAL(argv[2]);
-	SCHEME_ASSERT((start >= 0 && start <= len), "substring: first index out of bounds");
-	SCHEME_ASSERT((finish >= start && finish <= len), "substring: second index out of bounds");
+	SCHEME_ASSERT(start >= 0 && (size_t)start <= len, "substring: first index out of bounds");
+	/* start >= 0 and finish >= start, n.b. above */
+	SCHEME_ASSERT(finish >= start && (size_t)finish <= len, "substring: second index out of bounds");
 	str = scheme_alloc_string((size_t)(finish - start), 0);
 
 	for (i = 0 ; i < finish - start ; ++i) {
@@ -317,7 +318,7 @@ string_to_list(int argc, Scheme_Object *argv[])
 	len = strlen(chars);
 	first = last = scheme_null;
 
-	for (i = 0 ; i < len ; ++i) {
+	for (i = 0 ; (size_t)i < len ; ++i) {
 		pair = scheme_make_pair(scheme_make_char(chars[i]), scheme_null);
 
 		if (first == scheme_null) {
@@ -378,7 +379,7 @@ string_fill(int argc, Scheme_Object *argv[])
 	ch = SCHEME_CHAR_VAL(argv[1]);
 	len = strlen(chars);
 
-	for (i = 0 ; i < len ; ++i) {
+	for (i = 0 ; (size_t)i < len ; ++i) {
 		chars[i] = (char)ch;
 	}
 

@@ -124,6 +124,8 @@ define_syntax(Scheme_Object *form, Scheme_Env *env)
 		val = SCHEME_CAR(SCHEME_CDR(SCHEME_CDR(form)));
 		val = scheme_eval(val, env);
 	} else {
+		var = scheme_null;
+		val = scheme_null;
 		scheme_signal_error("define: second arg must be symbol or list");
 	}
 
@@ -222,7 +224,7 @@ static Scheme_Object *
 case_syntax(Scheme_Object *form, Scheme_Env *env)
 {
 	Scheme_Object *key, *clauses, *clause;
-	Scheme_Object *data, *exprs, *res;
+	Scheme_Object *data, *exprs, *res = scheme_null;
 	key = SCHEME_CAR(SCHEME_CDR(form));
 	clauses = SCHEME_CDR(SCHEME_CDR(form));
 	key = scheme_eval(key, env);
@@ -311,7 +313,7 @@ static Scheme_Object *named_let_syntax(Scheme_Object *form, Scheme_Env *env);
 static Scheme_Object *
 let_syntax(Scheme_Object *form, Scheme_Env *env)
 {
-	Scheme_Object *bindings, *binding, *vars, *vals, *forms, *ret;
+	Scheme_Object *bindings, *binding, *vars, *vals, *forms, *ret = scheme_null;
 	Scheme_Object *vars_last, *vals_last, *pair, *aform;
 	int num_int_defs, num_bindings, i;
 	Scheme_Env *frame;
@@ -430,7 +432,7 @@ named_let_syntax(Scheme_Object *form, Scheme_Env *env)
 static Scheme_Object *
 let_star_syntax(Scheme_Object *form, Scheme_Env *env)
 {
-	Scheme_Object *bindings, *vars, *vals, *forms, *ret;
+	Scheme_Object *bindings, *vars, *vals, *forms, *ret = scheme_null;
 	Scheme_Object *vars_last, *vals_last, *pair, *aform;
 	Scheme_Env *frame;
 	int num_int_defs, num_bindings, i;
@@ -529,7 +531,7 @@ let_star_syntax(Scheme_Object *form, Scheme_Env *env)
 static Scheme_Object *
 letrec_syntax(Scheme_Object *form, Scheme_Env *env)
 {
-	Scheme_Object *bindings, *vars, *vals, *forms, *res;
+	Scheme_Object *bindings, *vars, *vals, *forms, *res = scheme_null;
 	Scheme_Object *vars_last, *vals_last, *pair, *aform;
 	int num_int_defs;
 	bindings = SCHEME_CAR(SCHEME_CDR(form));
