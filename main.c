@@ -33,17 +33,27 @@ main(int argc, char *argv[])
 	FILE *fp;
 	global_env = scheme_basic_env();
 
+	/* initialize scheme_error_buf */
+	if (setjmp(scheme_error_buf)) {
+		fprintf(stderr, "Initialization failed.\n");
+		abort();
+	}
+
 	/* load any files given on the command line */
 	for (i = 1 ; i < argc ; ++i) {
 		fp = fopen(argv[i], "r");
 
 		if (! fp) {
-			fprintf(stderr, "could not open file for loading: %s\n", argv[i]);
+			fprintf(stderr, "Could not open file \"%s\" for loading.\n", argv[i]);
 		} else {
 			/* skip `#!' line if present */
 			fscanf(fp, "#!%*s\n");
 			/* read each expression and evaluate it */
 			in_port = scheme_make_file_input_port(fp);
+
+			if (setjmp(scheme_error_buf)) {
+				fprintf(stderr, "Could not read file \"%s\". Trying again.\n", argv[i]);
+			}
 
 			while ((obj = scheme_read(in_port)) != scheme_eof) {
 				obj = SCHEME_CATCH_ERROR(scheme_eval(obj, global_env), 0);
@@ -51,6 +61,10 @@ main(int argc, char *argv[])
 
 			scheme_close_input_port(in_port);
 		}
+	}
+
+	if (setjmp(scheme_error_buf)) {
+		fprintf(stderr, "Could not read stdin port. Trying again.\n");
 	}
 
 	/* enter read-eval-print loop */

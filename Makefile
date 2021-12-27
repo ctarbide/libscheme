@@ -20,13 +20,13 @@ CPROTO = cproto
 
 # https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
 # WARNING: some warnings only show up when using optimizations (!)
-OFLAG = -O2
-# OFLAG = -O0
+OPTFLAGS = -O2
+# OPTFLAGS = -O0
 
 # WERROR = -Werror -fmax-errors=5
 WERROR =
 
-CFLAGS = -ggdb3 $(OFLAG) -std=c99 \
+CFLAGS = -ggdb3 $(OPTFLAGS) -std=c99 \
     -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
     -Wshadow -Wconversion -Wdeclaration-after-statement \
     -Wno-unused-parameter \
@@ -102,7 +102,7 @@ test: libscheme.a main.o
 
 .PHONY: sparse
 sparse:
-	sparse -Wsparse-all $(CFLAGS) -Wno-transparent-union $(SRCS)
+	sparse -Wsparse $(CFLAGS) -Wno-transparent-union $(SRCS)
 
 clean:
 	rm -f $(OBJS) main.o libscheme.a test *~ \

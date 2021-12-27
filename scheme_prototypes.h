@@ -47,7 +47,7 @@ void scheme_init_list(Scheme_Env *env);
 Scheme_Object *scheme_make_pair(Scheme_Object *car, Scheme_Object *cdr);
 Scheme_Object *scheme_alloc_list(int size);
 int scheme_list_length(Scheme_Object *list);
-Scheme_Object *scheme_map_1(Scheme_Object *(*fun)(Scheme_Object *), Scheme_Object *lst);
+Scheme_Object *scheme_map_1(Scheme_Object * (*fun)(Scheme_Object *), Scheme_Object *lst);
 Scheme_Object *scheme_car(Scheme_Object *pair);
 Scheme_Object *scheme_cdr(Scheme_Object *pair);
 Scheme_Object *scheme_cadr(Scheme_Object *pair);

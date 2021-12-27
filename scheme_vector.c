@@ -107,7 +107,7 @@ vector(int argc, Scheme_Object *argv[])
 {
 	Scheme_Object *vec;
 	int i;
-	vec = scheme_make_vector(argc, 0);
+	vec = scheme_make_vector(argc, NULL);
 
 	for (i = 0 ; i < argc ; ++i) {
 		SCHEME_VEC_ELS(vec)[i] = argv[i];
@@ -195,7 +195,7 @@ scheme_list_to_vector(Scheme_Object *list)
 	int len, i;
 	Scheme_Object *vec;
 	len = scheme_list_length(list);
-	vec = scheme_make_vector(len, 0);
+	vec = scheme_make_vector(len, NULL);
 	i = 0;
 
 	while (! SCHEME_NULLP(list)) {

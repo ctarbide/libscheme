@@ -45,7 +45,7 @@ scheme_malloc(size_t size)
 {
 	void *space;
 	space = MALLOC(size);
-	SCHEME_ASSERT((space != 0), "memory allocation failure");
+	SCHEME_ASSERT(space != NULL, "memory allocation failure");
 	return space;
 }
 
@@ -54,7 +54,7 @@ scheme_calloc(size_t num, size_t size)
 {
 	void *space;
 	space = MALLOC(num * size);
-	SCHEME_ASSERT((space != 0), "memory allocation failure");
+	SCHEME_ASSERT(space != NULL, "memory allocation failure");
 #ifdef NO_GC
 	memset(space, 0, (num * size));
 #endif
