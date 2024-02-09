@@ -101,7 +101,7 @@ scheme_apply_struct_proc(Scheme_Object *sp, Scheme_Object *args)
 	}
 	}
 
-	SCHEME_ASSERT((0), "unknown struct procedure type");
+	scheme_signal_error("exhaustion: unknown struct procedure type");
 	return NULL; /* never happens, avoid warning */
 }
 

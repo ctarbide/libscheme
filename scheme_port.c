@@ -25,6 +25,8 @@
 #include "scheme.h"
 #include <stdio.h>
 
+#define FD_SET_CONVERTS_TO_UNSIGNED
+
 /* #define HAS_STANDARD_IOB 1 */
 /* #define HAS_GNU_IOB 1 */
 
@@ -231,7 +233,11 @@ is_ready(int fd)
 	fd_set fdset;
 	struct timeval timeout;
 	FD_ZERO(&fdset);
+#ifdef FD_SET_CONVERTS_TO_UNSIGNED
+	FD_SET(CASTING_IS_CODE_SMELL(int, unsigned, fd), &fdset);
+#else
 	FD_SET(fd, &fdset);
+#endif
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 1;
 	return select(fd + 1, &fdset, NULL, NULL, &timeout) == 1 ? 1 : 0;

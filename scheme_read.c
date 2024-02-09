@@ -68,6 +68,7 @@ start_over:
 
 	case ')':
 		scheme_signal_error("read: unexpected ')'");
+        break; /* never happens */
 
 	case '(':
 		return read_list(port);
@@ -152,6 +153,7 @@ start_over:
 		default:
 			scheme_signal_error("read: unexpected `#'");
 		}
+        FALLTHROUGH;
 
 	default:
 		if (isdigit(ch)) {
@@ -162,6 +164,8 @@ start_over:
 			return read_symbol(port);
 		}
 	}
+	scheme_signal_error("exhaustion");
+	return NULL; /* never happens */
 }
 
 #if 0

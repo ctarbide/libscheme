@@ -37,6 +37,14 @@
 #define _POSIX_C_SOURCE		200112L
 #endif
 
+#define CASTING_IS_CODE_SMELL(from,to,sym) ((to)(sym))
+
+#ifdef __GNUC__
+#define FALLTHROUGH __attribute__ ((fallthrough))
+#else
+#define FALLTHROUGH
+#endif
+
 #include <stdio.h>
 #include <setjmp.h>
 #include <stdarg.h>

@@ -4,7 +4,7 @@ has some bug fixes and minor improvements. The canonical source for this version
 is at https://github.com/ctarbide/libscheme.
 
 Dependencies and requirements, a C99 compiler and the excelent BDWGC
-(Boehm-Demers-Weiser Garbage Collector), go to https://github.com/ivmai/bdwgc
+(Boehm-Demers-Weiser Garbage Collector). Go to https://github.com/ivmai/bdwgc
 for more information.
 
 Installation, a simple "make" should build everything in a few seconds, then run

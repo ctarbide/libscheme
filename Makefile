@@ -23,10 +23,9 @@ CPROTO = cproto
 OPTFLAGS = -O2
 # OPTFLAGS = -O0
 
-# WERROR = -Werror -fmax-errors=5
-WERROR =
+WERROR = -Werror -fmax-errors=5
 
-CFLAGS = -ggdb3 $(OPTFLAGS) -std=c99 \
+CFLAGS = -ggdb3 $(OPTFLAGS) -ansi -pedantic \
     -Wall -Wextra -Wstrict-prototypes -Wmissing-prototypes \
     -Wshadow -Wconversion -Wdeclaration-after-statement \
     -Wno-unused-parameter \
